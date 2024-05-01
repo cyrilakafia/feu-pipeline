@@ -1,3 +1,47 @@
 # Functional Encoding Units (FEU)
 
-This is a codebase for obtaining functional encoding units (FEUs) built on PyTorch.  To test the code, run `python sim.py --seed 1231`.  You can modify the computing device with the `--device` flag (default is `cpu`).  
+## Overview
+
+This repository contains the implementation for extracting Functional Encoding Units (FEUs) using PyTorch. The code allows users to perform inference to identify optimal cluster assignments and parameters based on provided data.
+
+## Installation
+
+Ensure that you have PyTorch installed in your environment. If PyTorch is not installed, you can install it via pip:
+
+```bash
+pip install torch
+```
+
+## Usage
+
+To use this codebase, follow the steps outlined below:
+
+1. Import the `run_inference` function from the `inf` module.
+
+```python
+from inf import run_inference
+```
+
+2. Execute the `run_inference` function with the necessary parameters.
+
+```python
+best_assigns, best_params = run_inference('yourdata.p', title='demo', device='cpu', iterations=1500, seed=None)
+```
+
+3. Print the types of the outputs to verify.
+
+```python
+print(type(best_assigns))
+print(type(best_params))
+```
+
+## Outputs
+
+Running the `run_inference` function generates the following outputs:
+
+- **Cluster Assignments CSV:** Saves the best cluster assignments to `outputs/sim{run}_best_assigns.csv`.
+- **Cluster Parameters CSV:** Saves the best cluster parameters to `outputs/sim{run}_best_params.csv`.
+- **Scatter Plot PNG:** Saves a scatter plot of the cluster parameters to `outputs/sim{run}_params.png`.
+- **Heatmap PNG:** Saves a heatmap of the cluster assignments to `outputs/sim{run}_assigns.png`.
+
+These outputs are stored in the `outputs` directory, allowing easy access and analysis of the results.
