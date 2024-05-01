@@ -4,7 +4,24 @@
 
 This repository contains the implementation for extracting Functional Encoding Units (FEUs) using PyTorch. The code allows users to perform inference to identify optimal cluster assignments and parameters based on provided data.
 
+Disclaimer: This algorithm and library is still under construction
+
 ## Installation
+
+Start by cloning this repository.
+
+```bash
+git clone https://github.com/cyrilakafia/feu-pipeline.git
+```
+
+Ensure you are working in an environ with PyTorch, numpy, matplotlib and pandas install. We reccommend you create a new environment with conda and install these packages
+
+```bash
+conda create -n 'feu' python=3.10
+conda activate feu
+cd feu-pipeline
+pip install -r requirements.txt
+```
 
 Ensure that you have PyTorch installed in your environment. If PyTorch is not installed, you can install it via pip:
 
