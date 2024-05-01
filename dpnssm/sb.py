@@ -1,0 +1,197 @@
+from typing import Optional, Callable
+
+import time
+import torch
+from torch import Tensor
+from torch.distributions import Categorical, Normal, Beta
+from torch.nn.functional import pad
+import numpy as np
+import os.path
+
+
+# Run DPnSSM inference algorithm
+def infer_dp(
+    obs: Tensor,
+    calc_log_like: Callable[[Tensor, Tensor, Tensor], Tensor],
+    concentration: float,
+    samp_base: Callable[[int], Tensor],
+    base_logpdf: Callable[[Tensor], Tensor],
+    num_gibbs_iters: int = 500,
+    max_clusters: int = 20,
+    samp_prop: Optional[Callable[[Tensor], Tensor]] = None,
+    out_prefix: Optional[str] = None,
+    seed: Optional[int] = None,
+):
+    settings = {"dtype": obs.dtype, "device": obs.device}
+
+    # Set seed for reproducible results
+    if seed is not None:
+        torch.random.manual_seed(seed)
+
+    # Initialize variables
+    num_obs = len(obs)
+    num_clusters = max_clusters
+    # stick_fracs = Beta(concentration, 1).sample((max_clusters - 1,))
+    stick_fracs_np = np.random.beta(concentration, 1, size=(max_clusters - 1,)).astype(np.float32)
+    stick_fracs = torch.tensor(stick_fracs_np, device=obs.device)
+
+
+
+
+    params = samp_base(num_clusters)
+    num_params = params.size(dim=-1)
+
+    if samp_prop is None:
+        samp_prop = lambda x: x + (1 / torch.sqrt(x.shape[-1])) * torch.randn_like(x)
+
+    num_accept = 0
+    num_total = 0
+        
+    # create output directory
+    if not os.path.exists(out_prefix.split("/")[0]):
+        os.makedirs(out_prefix.split("/")[0])
+
+    if out_prefix is not None:
+        with open(out_prefix + "_assigns.csv", "w") as fassign:
+            fassign.write("")
+
+        with open(out_prefix + "_params.tsv", "w") as fcluster:
+            fcluster.write("")
+        # if os.path.isfile(out_prefix + "_assigns.txt") or os.path.isfile(
+        #     out_prefix + "_params.txt"
+        # ):
+        #     raise ValueError(f"There already exists a file with prefix {out_prefix}.")
+
+    for i in range(num_gibbs_iters):
+        t = time.time()
+
+        #########################################
+        ### STEP 1: UPDATE CLUSTER IDENTITIES ###
+        #########################################
+
+        # Compute cluster priors
+        stick_lengths = pad(stick_fracs, (0, 1), value=1) * pad(
+            torch.cumprod(1 - stick_fracs, dim=-1), (1, 0), value=1
+        )
+        assert torch.abs(torch.sum(stick_lengths) - 1.0) < 1e-6
+        log_priors = torch.log(stick_lengths)
+
+        # Flatten tensors for batch computation
+        obs_ = obs.unsqueeze(dim=1).expand((-1, num_clusters, -1)).flatten(0, 1)
+        params_ = params.unsqueeze(dim=0).expand((num_obs, -1, -1)).flatten(0, 1)
+        data_ids_ = (
+            torch.arange(num_obs, **settings)
+            .unsqueeze(dim=-1)
+            .expand((-1, num_clusters))
+            .flatten(0, 1)
+        )
+
+        # Compute cluster likelihoods
+        log_likelihoods = calc_log_like(obs_, params_, data_ids_).unflatten(
+            dim=0, sizes=(num_obs, num_clusters)
+        )
+
+        # Sample cluster id from posterior
+        posteriors = torch.softmax(log_priors + log_likelihoods, dim=-1)
+        cluster_ids = Categorical(posteriors).sample()
+
+        # Compute cluster counts
+        cluster_counts = torch.bincount(cluster_ids, minlength=max_clusters)
+
+        ###############################################
+        ### STEP 2: UPDATE STICK-BREAKING FRACTIONS ###
+        ###############################################
+
+        # Sample stick fracs
+        cluster_cumcounts = torch.cumsum(cluster_counts.flip([-1]), dim=-1).flip([-1])
+        # stick_fracs = Beta(
+        #     concentration0=1 + cluster_counts[:-1],
+        #     concentration1=concentration + cluster_cumcounts[1:],
+        # ).sample()
+
+        stick_fracs_np = np.random.beta(1 + cluster_counts[:-1].cpu().numpy(), concentration + cluster_cumcounts[1:].cpu().numpy())
+        stick_fracs = torch.tensor(stick_fracs_np, device=obs.device)
+
+
+
+        #########################################
+        ### STEP 3: UPDATE CLUSTER PARAMETERS ###
+        #########################################
+
+        # Sample proposals for active clusters
+        active_clusters = cluster_counts > 0
+        num_active = torch.sum(active_clusters)
+        params_prop = samp_prop(params[active_clusters])
+
+        # Renumber ids for active clusters
+        id_to_active = torch.zeros(num_clusters, dtype=torch.long, device=obs.device)
+        id_to_active[active_clusters] = torch.arange(num_active, device=obs.device)
+        id_to_active[~active_clusters] = 1e6
+        active_cluster_ids = id_to_active[cluster_ids]
+
+        # Calculate param priors and likelihoods
+        params_curr_logprobs = base_logpdf(params[active_clusters])
+        params_prop_logprobs = base_logpdf(params_prop)
+
+        params_curr_loglikes = log_likelihoods[
+            torch.arange(num_obs, device=obs.device), cluster_ids
+        ]
+        params_prop_loglikes = calc_log_like(
+            obs,
+            params_prop[active_cluster_ids],
+            torch.arange(num_obs, device=obs.device),
+        )
+        params_curr_loglikes = torch.bincount(
+            active_cluster_ids, weights=params_curr_loglikes
+        )
+        params_prop_loglikes = torch.bincount(
+            active_cluster_ids, weights=params_prop_loglikes
+        )
+
+        # Calculate param posteriors and Metropolis acceptances probs
+        params_curr_logposts = params_curr_logprobs + params_curr_loglikes
+        params_prop_logposts = params_prop_logprobs + params_prop_loglikes
+        accept_probs = torch.min(
+            torch.exp(params_prop_logposts - params_curr_logposts),
+            torch.ones(num_active, **settings),
+        )
+        accepts = torch.rand(num_active, **settings) < accept_probs
+        num_accept += torch.sum(accepts).item()
+        num_total += len(accepts)
+
+        # Determine new active parameters
+        params_active = torch.where(
+            accepts.unsqueeze(dim=-1), params_prop, params[active_clusters]
+        )
+
+        # Sample new inactive parameters
+        params_inactive = samp_base(torch.sum(~active_clusters))
+
+        # Update parameters
+        params[active_clusters] = params_active
+        params[~active_clusters] = params_inactive
+
+        # Save samples
+        active_cluster_ids = active_cluster_ids.clone().cpu().numpy()
+        params_active = params_active.clone().cpu().numpy()
+
+        # Print and log output
+        iter_time = time.time() - t
+        print(
+            f"iter: #{i:3d} | time: {iter_time:4.2f} | num clusters: {len(params_active)} "
+            f"| counts: {str(np.bincount(active_cluster_ids))} | accept prob: {num_accept / num_total:.3f}"
+        )
+        print(f"             params: {np.array2string(params_active.T[0].round(2))}")
+        print(f"                     {np.array2string(params_active.T[1].round(2))}")
+
+        # Write pickle
+        if out_prefix is not None:
+            with open(out_prefix + "_assigns.csv", "a") as fassign:
+                fassign.write(",".join([str(x) for x in active_cluster_ids]))
+                fassign.write("\n")
+
+            with open(out_prefix + "_params.tsv", "a") as fcluster:
+                fcluster.write(
+                    "\t".join([f"{p1:.5f},{p2:.5f}" for p1, p2 in params_active])
+                )
+                fcluster.write("\n")
