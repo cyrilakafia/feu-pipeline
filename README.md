@@ -107,4 +107,4 @@ Assuming you have already run the inference process but visualizations and best 
 ```python
 best_assigns, best_params = viz_heatmap(title, num_iterations, 'cluster_assigns.csv', 'cluster_params.tsv', max_clusters=max_clusters)
 ```
-See `run_inf.py` for more details on how to use the pipeline
+See [run_inf.py](https://github.com/cyrilakafia/feu-pipeline/blob/main/run_inf.py) for more details on how to use the pipeline
