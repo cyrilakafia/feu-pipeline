@@ -1,7 +1,7 @@
 from inf import run_inference
 from dpnssm.prep import prep
 import os
-
+from dpnssm.visualize_heatmap import viz_heatmap
 
 original_data = 'test_data/array_30_200.pkl'
 
@@ -14,20 +14,32 @@ if not os.path.exists('outputs'):
 prep(original_data, preprocessed_data)
 
 # Run the inference process
+title = 'demo_run'
+device = 'cpu'
+num_iterations = 5
+conc = 1
+max_clusters = 20
+stimulus_timepoint = 0
+
+
 best_assigns, best_params = run_inference(
                                         preprocessed_data,
-                                        title='demo', 
-                                        device='cpu', 
-                                        iterations=5, 
-                                        concentration=1, 
-                                        max_clusters=20, 
-                                        timepoint=0, 
+                                        title=title, 
+                                        device=device,
+                                        iterations=num_iterations,
+                                        concentration=conc, 
+                                        max_clusters=max_clusters,
+                                        timepoint=stimulus_timepoint,
                                         seed=None
                                         )
 
-# print(type(best_assigns))
-# print(type(best_params))
+print(type(best_assigns))
+print(type(best_params))
 
 # <class 'pandas.core.frame.DataFrame'>
-# <class 'pandas.core.frame.DataFrame'>ex
+# <class 'pandas.core.frame.DataFrame'>
+
+# Assuming you have already run the inference process, you can find best assignment and paramsn and visualize the results using the following code:
+
+#best_assigns, best_params = viz_heatmap(title, num_iterations, 'outputs/simdemo_run_assigns.csv', 'outputs/simdemo_run_params.tsv', max_clusters=max_clusters)
 
