@@ -5,6 +5,31 @@ from dpnssm.sb import infer_dp
 from dpnssm.visualize_heatmap import viz_heatmap
 
 def run_inference(file, title, device, iterations, concentration=1.0, max_clusters=20, timepoint=100, seed=None):
+    """
+    Run the inference process on the given data.
+
+    Parameters:
+    file (str): Path to the file containing the data to be processed.
+    title (str): Name for the run. Eg. 'rodent_5'
+    device (str): Device to be used for PyTorch computation. Options: 'cpu', 'cuda'
+    iterations (int): Number of iterations for the inference process.
+    concentration (float, optional): Probability of increased number of clusters. Defaults to 1.0.
+    max_clusters (int, optional): Maximum number of clusters for the Dirichlet Process. Defaults to 20.
+    timepoint (int, optional): Timepoint for stimulus. Defaults to 100.
+    seed (int, optional): Seed for the random number generator. Defaults to None.
+
+    Returns:
+    tuple: The best assignments and parameters resulting from the inference process.
+
+    Outpus:
+    Best cluster assignments CSV: Saves the best cluster assignments to `outputs/sim{run}_best_assigns.csv`.
+    Best cluster parameters CSV: Saves the best cluster parameters to `outputs/sim{run}_best_params.csv`.
+    Scatter Plot PNG: Saves a scatter plot of the cluster parameters to `outputs/sim{run}_params.png`.
+    Heatmap PNG: Saves a heatmap of the cluster assignments to `outputs/sim{run}_assigns.png`.
+    Cluster assignments CSV: Saves the cluster assignments to `outputs/sim{run}_assigns.csv`.
+    Cluster parameters CSV: Saves the cluster parameters to `outputs/sim{run}_params.csv`.
+    """
+    
     torch.set_default_dtype(torch.double)
     torch.set_default_device(device)
 
