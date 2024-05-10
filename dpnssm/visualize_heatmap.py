@@ -23,13 +23,16 @@ def ids_to_coo(ids):
         coo[np.ix_(mask, mask)] = 1
     return coo
 
-def viz_heatmap(run, iter, max_clusters=20):
+def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20):
     '''
     Visualize the cluster assignments as a heatmap
 
     Args:
     run (str): the run number
     iter (int): the number of iterations
+    assigns (pd.DataFrame): the cluster assignments
+    params (pd.DataFrame): the cluster parameters
+    max_clusters (int): the maximum number of clusters
 
     
     Returns:
@@ -43,12 +46,21 @@ def viz_heatmap(run, iter, max_clusters=20):
     '''
 
     if iter < 510:
-        assigns = pd.read_csv(f"outputs/sim{run}_assigns.csv", header=None)
-        params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
+        if assigns_df is None or params_df is None:
+            assigns = pd.read_csv(f"outputs/sim{run}_assigns.csv", header=None)
+            params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
+        else:
+            assigns = pd.read_csv(f"{assigns_df}", header=None)
+            params = pd.read_csv(f"{params_df}", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
 
     else:
-        assigns = pd.read_csv(f"outputs/sim{run}_assigns.csv", header=None).iloc[500:].reset_index(drop=True)
-        params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
+        if assigns_df is None or params_df is None:
+            assigns = pd.read_csv(f"outputs/sim{run}_assigns.csv", header=None).iloc[500:].reset_index(drop=True)
+            params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
+        else:
+            assigns = pd.read_csv(f"{assigns_df}", header=None).iloc[500:].reset_index(drop=True)
+            params = pd.read_csv(f"{params_df}", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
+        
 
     params.fillna('0,0', inplace=True)
     split_params = params.applymap(lambda x: np.array(x.split(','), dtype=float))
