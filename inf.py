@@ -29,7 +29,7 @@ def run_inference(file, title, device, iterations, concentration=1.0, max_cluste
     Cluster assignments CSV: Saves the cluster assignments to `outputs/sim{run}_assigns.csv`.
     Cluster parameters CSV: Saves the cluster parameters to `outputs/sim{run}_params.csv`.
     """
-    
+
     torch.set_default_dtype(torch.double)
     torch.set_default_device(device)
 
@@ -87,8 +87,10 @@ def run_inference(file, title, device, iterations, concentration=1.0, max_cluste
         seed=seed,
     )
 
-    print(f'Title {title}, Iterations {iterations}')
+    # print(f'Title of {title}, Iterations {iterations}')
+    print(f'{title} run for {iterations} iterations - Inference done')
     best_assings, best_params = viz_heatmap(title, iterations)
+    print('Pipeline done')
     return best_assings, best_params
 
 # # Example of how to call the function
