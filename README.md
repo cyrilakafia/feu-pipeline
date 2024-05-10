@@ -42,7 +42,15 @@ from inf import run_inference
 2. Execute the `run_inference` function with the necessary parameters.
 
 ```python
-best_assigns, best_params = run_inference('yourdata.p', title='demo', device='cpu', iterations=1500, seed=None)
+best_assigns, best_params = run_inference('yourdata.p', 
+                                          title='demo', 
+                                          device='cpu', 
+                                          iterations=5, 
+                                          concentration=1, 
+                                          max_clusters=20, 
+                                          timepoint=100, 
+                                          seed=None
+                                          )
 ```
 
 3. Print the types of the outputs to verify.
