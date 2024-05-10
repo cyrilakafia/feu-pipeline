@@ -70,6 +70,21 @@ def prep_numpy(data, dst):
 
     print('Preprocessing done')
 
+def prep_torch(data, dst):
+    pass
+
+def prep_csv(data, dst):
+    pass
+
+def prep_xls(data, dst):
+    pass
+
+def prep_txt(data, dst):
+    pass
+
+def prep_nwb(data, dst):
+    pass
+
 
 def prep(data, dst):
     """
@@ -91,7 +106,6 @@ def prep(data, dst):
         prep_numpy(data, dst)
     else:
         print('Unsupported file type - Preprocessing failed')
-
 
 if __name__ == '__main__':
     prep_pickle("../test_data/original_pickle_data.pickle", "../test_data/pickle_data_after_prep.p")
