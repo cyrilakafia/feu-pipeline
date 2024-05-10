@@ -35,7 +35,7 @@ from dpnssm.prep import prep
 import os
 ```
 
-## Data
+### Data
 Ideally data your data should have be 2 dimensional torch array and saved as a torch file with extension .p. However, we handle conversion to torch file from other formats listed below:
 
 - .pkl
