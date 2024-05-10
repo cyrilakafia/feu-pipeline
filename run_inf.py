@@ -3,7 +3,7 @@ from dpnssm.prep import prep
 import os
 
 
-original_data = '/Users/csa46/Documents/Computation/functional encoding units/GUI/feu-app/test_data/array_30_200.pkl'
+original_data = 'test_data/array_30_200.pkl'
 
 # Preprocess the data
 preprocessed_data = 'outputs/processed_data.p'
@@ -15,7 +15,6 @@ prep(original_data, preprocessed_data)
 
 # Run the inference process
 best_assigns, best_params = run_inference(
-                                        # '/Users/csa46/Documents/Computation/functional encoding units/feu-with1231/sim1231_true.p', 
                                         preprocessed_data,
                                         title='demo', 
                                         device='cpu', 
