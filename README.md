@@ -22,6 +22,16 @@ conda activate feu
 cd feu-pipeline
 pip install -r requirements.txt
 ```
+## Data 
+
+The data processed by the pipeline is `two-dimensional time series data`, where the first dimension represents the variables to be clustered, and the second dimension represents the corresponding time series data.
+
+For example, consider electrophysiological data recorded from 25 neurons over a duration of 1000 seconds. Assuming that one measurement is recorded every second, the data will have a shape of (25, 1000). Each row corresponds to a different neuron, and each column represents sequential time points.
+
+This structured data should be saved in a `PyTorch file with the .p` extension. Conversion from other data formats to the PyTorch format is supported within our pipeline, ensuring compatibility and ease of integration for various data sources. This structure facilitates the application of time series analysis or clustering algorithms on the dataset.
+
+To test the code, run `python sim.py --seed 1231` in a terminal environment.  You can modify the computing device with the `--device` flag (default is `cpu`).  
+
 
 ## Usage
 
@@ -35,8 +45,7 @@ from dpnssm.prep import prep
 import os
 ```
 
-### Data
-Ideally data your data should have be 2 dimensional torch array and saved as a torch file with extension .p. However, we handle conversion to torch file from other formats listed below:
+We handle conversion to PyTorch file from other formats listed below:
 
 - .pkl
 - .pickle
