@@ -23,12 +23,6 @@ cd feu-pipeline
 pip install -r requirements.txt
 ```
 
-Ensure that you have PyTorch installed in your environment. If PyTorch is not installed, you can install it via pip:
-
-```bash
-pip install torch
-```
-
 ## Usage
 
 To use this codebase, follow the steps outlined below:
