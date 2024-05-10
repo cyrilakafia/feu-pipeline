@@ -23,7 +23,7 @@ def ids_to_coo(ids):
         coo[np.ix_(mask, mask)] = 1
     return coo
 
-def viz_heatmap(run, iter):
+def viz_heatmap(run, iter, max_clusters=20):
     '''
     Visualize the cluster assignments as a heatmap
 
@@ -44,11 +44,11 @@ def viz_heatmap(run, iter):
 
     if iter < 510:
         assigns = pd.read_csv(f"outputs/sim{run}_assigns.csv", header=None)
-        params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, 9))
+        params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
 
     else:
         assigns = pd.read_csv(f"outputs/sim{run}_assigns.csv", header=None).iloc[500:].reset_index(drop=True)
-        params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, 9)).iloc[500:].reset_index(drop=True)
+        params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
 
     params.fillna('0,0', inplace=True)
     split_params = params.applymap(lambda x: np.array(x.split(','), dtype=float))
@@ -57,8 +57,10 @@ def viz_heatmap(run, iter):
 
     for count, datapoint in enumerate(assigns):
         datapoint_params = []
-
+        print(f'datapoint {assigns[datapoint]}')
         for index, assignments in enumerate(assigns[datapoint]):
+            print(f'index: {index}')
+            print(f'assignments: {split_params[assignments]}')
             datapoint_params.append(split_params[assignments].iloc[index])
     
         # convert to numpy array for efficient array indexing
