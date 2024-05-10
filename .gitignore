@@ -1,6 +1,9 @@
 # Output folder
 outputs/
 
+# Test data folder
+test_data/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 */__pycache__/
