@@ -89,7 +89,7 @@ def run_inference(file, title, device, iterations, concentration=1.0, max_cluste
 
     # print(f'Title of {title}, Iterations {iterations}')
     print(f'{title} run for {iterations} iterations - Inference done')
-    best_assings, best_params = viz_heatmap(title, iterations)
+    best_assings, best_params = viz_heatmap(title, iterations, max_clusters=max_clusters)
     print('Pipeline done')
     return best_assings, best_params
 
