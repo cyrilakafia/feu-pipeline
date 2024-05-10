@@ -75,7 +75,7 @@ def viz_heatmap(run, iter):
         average_params.append(final_datapoint_param_average)
 
     average_params = np.array(average_params)
-    print(f'final params: {average_params}')
+    # print(f'final params: {average_params}')
 
     coos = np.stack([ids_to_coo(x) for _, x in assigns.iterrows()])
     mean_coo = coos.mean(axis=0)
@@ -91,12 +91,14 @@ def viz_heatmap(run, iter):
     best_params = pd.DataFrame(average_params)
     best_params.columns = ['jump', 'phasicity']
     best_params.to_csv(f'outputs/sim{run}_best_params.csv')
+    print('Found best parameters. Saving to file to outputs/sim{run}_best_params.csv')
 
     # rotate the df
     best_assigns = best_assigns.T
 
     # save best_assigns to csv file
     best_assigns.to_csv(f'outputs/sim{run}_best_assigns.csv')
+    print('Found best assigns. Saving to file to outputs/sim{run}_best_assigns.csv')
 
     reorder = assigns.loc[min_dist_idx].sort_values().index
 
@@ -120,6 +122,7 @@ def viz_heatmap(run, iter):
         plt.savefig(f'outputs/sim{run}_assigns.png', dpi = 500)
         
     plt.close()
+    print('Saving cluster assignments heatmap to outputs/sim{run}_assigns.png')
 
     # make params figure
     plt.scatter(average_params[:, 1] + 15, average_params[:, 0], s=20)
@@ -129,6 +132,7 @@ def viz_heatmap(run, iter):
     plt.tight_layout()
     plt.savefig(f'outputs/sim{run}_params.png', dpi = 500)
     plt.close()
+    print('Saving scatter plot of cluster parameters to outputs/sim{run}_params.png')
 
 
     return best_assigns, best_params
