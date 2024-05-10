@@ -101,3 +101,10 @@ Running the `run_inference` function generates the following outputs:
 - **Cluster Parameters CSV:** Saves the cluster parameters to `outputs/sim{run}_params.csv`.
 
 These outputs are stored in the `outputs` directory, allowing easy access and analysis of the results.
+
+Assuming you have already run the inference process but visualizations and best assign/paramaters didn't run, you can find best assignment and paramaters and visualize the results using the following code:
+
+```python
+best_assigns, best_params = viz_heatmap(title, num_iterations, 'cluster_assigns.csv', 'cluster_params.tsv', max_clusters=max_clusters)
+```
+See `run_inf.py` for more details on how to use the pipeline
