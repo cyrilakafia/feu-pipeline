@@ -48,9 +48,9 @@ Ideally data your data should have be 2 dimensional torch array and saved as a t
 
 2. Preprocess the data
 ```python
-original_data = 'test_data/array_30_200.pkl'
+original_data = 'test_data/array_30_200.pkl'    # path to the data
 
-preprocessed_data = 'outputs/processed_data.p'
+preprocessed_data = 'outputs/processed_data.p'  # path to save the preprocessed data
 
 if not os.path.exists('outputs'):
     os.makedirs('outputs')
@@ -84,9 +84,11 @@ print(type(best_params))
 
 Running the `run_inference` function generates the following outputs:
 
-- **Cluster Assignments CSV:** Saves the best cluster assignments to `outputs/sim{run}_best_assigns.csv`.
-- **Cluster Parameters CSV:** Saves the best cluster parameters to `outputs/sim{run}_best_params.csv`.
+- **Best Cluster Assignments CSV:** Saves the best cluster assignments to `outputs/sim{run}_best_assigns.csv`.
+- **Best Cluster Parameters CSV:** Saves the best cluster parameters to `outputs/sim{run}_best_params.csv`.
 - **Scatter Plot PNG:** Saves a scatter plot of the cluster parameters to `outputs/sim{run}_params.png`.
 - **Heatmap PNG:** Saves a heatmap of the cluster assignments to `outputs/sim{run}_assigns.png`.
+- **Cluster Assignments CSV:** Saves the cluster assignments to `outputs/sim{run}_assigns.csv`.
+- **Cluster Parameters CSV:** Saves the cluster parameters to `outputs/sim{run}_params.csv`.
 
 These outputs are stored in the `outputs` directory, allowing easy access and analysis of the results.
