@@ -4,7 +4,7 @@ from dpnssm.nssm import nssm_log_likelihood
 from dpnssm.sb import infer_dp
 from dpnssm.visualize_heatmap import viz_heatmap
 
-def run_inference(file, title, device, iterations, seed=None):
+def run_inference(file, title, device, iterations, concentration=1.0, max_clusters=20, timepoint=100, seed=None):
     torch.set_default_dtype(torch.double)
     torch.set_default_device(device)
 
@@ -36,11 +36,11 @@ def run_inference(file, title, device, iterations, seed=None):
     def calc_bssm_log_like_sim(obs, params, ns):
         jumps = params[:, 0]
         log_vars = params[:, 1]
-        p_inits = torch.sum(obs[:, :100], dim=-1) / (45 * 5 * 100)
+        p_inits = torch.sum(obs[:, :100], dim=-1) / (45 * 5 * 100)   # TO DO
         mean_inits = torch.log(p_inits)
         variances = torch.exp(log_vars)
         return nssm_log_likelihood(
-            obs[:, 100:],
+            obs[:, timepoint:],
             var=variances,
             num_particles=64,
             num_bin_trials=45 * 5,
@@ -52,12 +52,13 @@ def run_inference(file, title, device, iterations, seed=None):
     output = infer_dp(
         obs_all.to(device),
         calc_bssm_log_like_sim,
-        1.0,
+        concentration,
         samp_base,
         base_logpdf,
         num_gibbs_iters=iterations,
         samp_prop=samp_prop,
         out_prefix=f"outputs/sim{title}",
+        max_clusters=max_clusters,
         seed=seed,
     )
 
@@ -66,4 +67,4 @@ def run_inference(file, title, device, iterations, seed=None):
     return best_assings, best_params
 
 # # Example of how to call the function
-# output = run_inference('outputs/sim1231_true.p', '1', 'cpu', 1500)
+# output = run_inference('outputs/sim1231_true.p', '1', 'cpu', 1500, 1.0)
