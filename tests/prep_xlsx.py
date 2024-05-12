@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import torch
 import os
-from dpnssm.prep import prep_xlsx
+from feu.prep import prep_xlsx
 
 class TestPrepXlsx(unittest.TestCase):
     def setUp(self):

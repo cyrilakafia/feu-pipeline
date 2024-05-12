@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import os
 import pickle
-from dpnssm.prep import prep_pickle
+from feu.prep import prep_pickle
 
 class TestPrepPickle(unittest.TestCase):
     def setUp(self):

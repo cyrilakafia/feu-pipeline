@@ -1,7 +1,7 @@
 import unittest
 import torch
 import os
-from dpnssm.prep import prep_torch
+from feu.prep import prep_torch
 
 class TestPrepTorch(unittest.TestCase):
     def setUp(self):

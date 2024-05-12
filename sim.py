@@ -1,10 +1,10 @@
 import torch
 from torch.distributions import Uniform, Normal, Binomial, Poisson
 
-from dpnssm.nssm import nssm_log_likelihood
-from dpnssm.sb import infer_dp
+from feu.nssm import nssm_log_likelihood
+from feu.sb import infer_dp
 
-from dpnssm.visualize_heatmap import viz_heatmap
+from feu.visualize_heatmap import viz_heatmap
 
 import argparse
 import os.path

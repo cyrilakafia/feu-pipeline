@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import torch
 import os
-from dpnssm.prep import prep_csv
+from feu.prep import prep_csv
 
 class TestPrepFunctions(unittest.TestCase):
     def setUp(self):

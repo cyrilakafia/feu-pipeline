@@ -1,8 +1,8 @@
 import torch
 from torch.distributions import Uniform, Normal
-from dpnssm.nssm import nssm_log_likelihood
-from dpnssm.sb import infer_dp
-from dpnssm.visualize_heatmap import viz_heatmap
+from feu.nssm import nssm_log_likelihood
+from feu.sb import infer_dp
+from feu.visualize_heatmap import viz_heatmap
 
 def run_inference(file, title, device, iterations, concentration=1.0, max_clusters=20, timepoint=100, seed=None):
     """

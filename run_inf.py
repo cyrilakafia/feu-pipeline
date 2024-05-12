@@ -1,7 +1,7 @@
-from dpnssm.inf import run_inference
-from dpnssm.prep import prep
+from feu.inf import run_inference
+from feu.prep import prep
 import os
-from dpnssm.visualize_heatmap import viz_heatmap
+from feu.visualize_heatmap import viz_heatmap
 
 original_data = 'test_data/array_30_200.pkl'
 

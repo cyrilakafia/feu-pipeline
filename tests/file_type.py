@@ -1,5 +1,5 @@
 import unittest
-from dpnssm.prep import check_file_type
+from feu.prep import check_file_type
 
 class TestCheckFileType(unittest.TestCase):
     def test_check_file_type(self):

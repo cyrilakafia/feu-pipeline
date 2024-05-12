@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import torch
 import os
-from dpnssm.prep import prep_numpy
+from feu.prep import prep_numpy
 
 class TestPrepNumpy(unittest.TestCase):
     def setUp(self):
