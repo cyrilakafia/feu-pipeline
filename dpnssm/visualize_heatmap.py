@@ -69,10 +69,7 @@ def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20)
 
     for count, datapoint in enumerate(assigns):
         datapoint_params = []
-        print(f'datapoint {assigns[datapoint]}')
         for index, assignments in enumerate(assigns[datapoint]):
-            print(f'index: {index}')
-            print(f'assignments: {split_params[assignments]}')
             datapoint_params.append(split_params[assignments].iloc[index])
     
         # convert to numpy array for efficient array indexing

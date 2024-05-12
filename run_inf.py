@@ -1,4 +1,4 @@
-from inf import run_inference
+from dpnssm.inf import run_inference
 from dpnssm.prep import prep
 import os
 from dpnssm.visualize_heatmap import viz_heatmap
