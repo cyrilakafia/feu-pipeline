@@ -71,7 +71,26 @@ def prep_numpy(data, dst):
     print('Preprocessing done')
 
 def prep_torch(data, dst):
-    pass
+    x = torch.load(data)
+    
+    # check if the data is a tuple
+    if isinstance(x, tuple):
+        pass
+    else:
+        x = (x, )
+
+    # check if the data is a tensor
+    if not isinstance(x[0], torch.Tensor):
+        x_tensor = (torch.tensor(x[0]), )
+
+    else:
+        x_tensor = x
+
+    # check to see if the data is 2D
+    if len(x_tensor[0].shape) != 2:
+        return 'Data must be 2D'
+    
+    torch.save(x_tensor, dst)
 
 def prep_csv(data, dst):
     pass
