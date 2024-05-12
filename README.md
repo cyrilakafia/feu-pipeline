@@ -50,9 +50,9 @@ We handle conversion to PyTorch file from other formats listed below:
 - .pkl
 - .pickle
 - .npy
-- .txt [TODO]
-- .csv [TODO]
-- .xlxs [TODO]
+- .txt
+- .csv
+- .xlsx
 - .nwb [TODO]
 
 2. Preprocess the data
