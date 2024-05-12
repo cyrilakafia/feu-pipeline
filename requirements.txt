@@ -1,5 +1,4 @@
-pytorch
+torch
 numpy
 matplotlib
 pandas
-pickle
