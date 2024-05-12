@@ -24,7 +24,7 @@ pip install -r requirements.txt
 ```
 ## Data 
 
-The data processed by the pipeline is `two-dimensional time series data`, where the first dimension represents the variables to be clustered, and the second dimension represents the corresponding time series data.
+The data processed by the pipeline is `two-dimensional time series data`, where the first dimension represents the variables to be clustered, and the second dimension represents the corresponding time series data/timepoints.
 
 For example, consider electrophysiological data recorded from 25 neurons over a duration of 1000 seconds. Assuming that one measurement is recorded every second, the data will have a shape of (25, 1000). Each row corresponds to a different neuron, and each column represents sequential time points.
 
