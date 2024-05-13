@@ -41,7 +41,7 @@ To use this codebase, follow the steps outlined below:
 
 ```python
 from inf import run_inference
-from dpnssm.prep import prep
+from feu.prep import prep
 import os
 ```
 

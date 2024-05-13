@@ -4,7 +4,7 @@ from feu.nssm import nssm_log_likelihood
 from feu.sb import infer_dp
 from feu.visualize_heatmap import viz_heatmap
 
-def run_inference(file, title, device, iterations, concentration=1.0, max_clusters=20, timepoint=100, seed=None):
+def run_inference(file, title, device, iterations, concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=100, seed=None):
     """
     Run the inference process on the given data.
 
@@ -15,7 +15,7 @@ def run_inference(file, title, device, iterations, concentration=1.0, max_cluste
     iterations (int): Number of iterations for the inference process.
     concentration (float, optional): Probability of increased number of clusters. Defaults to 1.0.
     max_clusters (int, optional): Maximum number of clusters for the Dirichlet Process. Defaults to 20.
-    timepoint (int, optional): Timepoint for stimulus. Defaults to 100.
+    t_stimulus (int, optional): Timepoint for stimulus. Defaults to 100.
     seed (int, optional): Seed for the random number generator. Defaults to None.
 
     Returns:
@@ -29,6 +29,12 @@ def run_inference(file, title, device, iterations, concentration=1.0, max_cluste
     Cluster assignments CSV: Saves the cluster assignments to `outputs/sim{run}_assigns.csv`.
     Cluster parameters CSV: Saves the cluster parameters to `outputs/sim{run}_params.csv`.
     """
+
+    if t_stimulus <= 0:
+        raise ValueError('t_stimulus should be greater than 0')
+    
+    # Print parameters
+    print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Number of trials {num_trials}, Stimulus Timepoint {t_stimulus}, Seed {seed}')
 
     torch.set_default_dtype(torch.double)
     torch.set_default_device(device)
@@ -61,14 +67,14 @@ def run_inference(file, title, device, iterations, concentration=1.0, max_cluste
     def calc_bssm_log_like_sim(obs, params, ns):
         jumps = params[:, 0]
         log_vars = params[:, 1]
-        p_inits = torch.sum(obs[:, :100], dim=-1) / (45 * 5 * 100)   # TO DO
+        p_inits = torch.sum(obs[:, :t_stimulus], dim=-1) / (num_trials * t_stimulus)   # TO DO
         mean_inits = torch.log(p_inits)
         variances = torch.exp(log_vars)
         return nssm_log_likelihood(
-            obs[:, timepoint:],
+            obs[:, t_stimulus:],
             var=variances,
             num_particles=64,
-            num_bin_trials=45 * 5,
+            num_bin_trials=num_trials,
             max_iters=3,
             mean_init=mean_inits + jumps,
             var_init=1e-10,

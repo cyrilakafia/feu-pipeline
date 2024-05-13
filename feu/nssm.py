@@ -127,9 +127,12 @@ def particle_filter(
         )  # B
         curr_weights_norm = curr_weights / curr_weights.sum(dim=0)  # S x B
         if curr_weights_norm.isnan().any():
-            import pdb
+            # import pdb
 
-            pdb.set_trace()
+            # pdb.set_trace()
+
+            raise ValueError("NaNs in weights")
+            
         curr_ess = 1 / ((curr_weights_norm**2).sum(dim=0))  # B
 
         # Save necessary information
@@ -169,9 +172,10 @@ def systematic_resampling(particles: Tensor, weights: Tensor):
     try:
         resampled = torch.gather(particles, dim=-1, index=indices)
     except:
-        import pdb
+        # import pdb
 
-        pdb.set_trace()
+        # pdb.set_trace()
+        raise ValueError("Error in systematic resampling")
     return resampled
 
 

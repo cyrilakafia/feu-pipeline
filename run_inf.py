@@ -19,7 +19,8 @@ device = 'cpu'
 num_iterations = 5
 conc = 1
 max_clusters = 20
-stimulus_timepoint = 0
+stimulus_timepoint = 1
+num_trials = 100
 
 
 best_assigns, best_params = run_inference(
@@ -29,9 +30,9 @@ best_assigns, best_params = run_inference(
                                         iterations=num_iterations,
                                         concentration=conc, 
                                         max_clusters=max_clusters,
-                                        timepoint=stimulus_timepoint,
-                                        seed=None
-                                        )
+                                        num_trials=num_trials,
+                                        t_stimulus=stimulus_timepoint,
+                                        seed=None)
 
 print(type(best_assigns))
 print(type(best_params))

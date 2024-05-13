@@ -29,6 +29,10 @@ def check_file_type(data):
         return 'txt'
     elif data.endswith('.nwb'):
         return 'nwb'
+    elif data.endswith('.p'):
+        return 'torch'
+    elif data.endswith('.pt'):
+        return 'torch'
     else:
         return 'Unsupported file type'
 
@@ -156,6 +160,8 @@ def prep(data, dst):
         prep_xlsx(data, dst)
     elif file_type == 'txt':
         prep_txt(data, dst)
+    elif file_type == 'torch':
+        prep_torch(data, dst)
     else:
         return 'Unsupported file type'
 
