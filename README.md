@@ -76,8 +76,9 @@ best_assigns, best_params = run_inference(
                                         device='cpu',   # device to run the model on (cpu or cuda)
                                         iterations=1500,# number of iterations to run the model
                                         concentration=1,# probability of increasing the number of clusters. 1 is the default and 
-                                        max_clusters=20,# maximum number of clusters to consider   
-                                        timepoint=0,    # timepoint of stimulus if there is one
+                                        max_clusters=20,# maximum number of clusters to consider 
+                                        num_trials=1,   # number of trials to run the model  
+                                        t_stimulus=0,    # timepoint of stimulus if there is one
                                         seed=None       # seed for reproducibility
                                         )
 ```
