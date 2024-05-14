@@ -116,3 +116,7 @@ Assuming you have already run the inference process but visualizations and best 
 best_assigns, best_params = viz_heatmap(title, num_iterations, 'cluster_assigns.csv', 'cluster_params.tsv', max_clusters=max_clusters)
 ```
 See [run_inf.py](https://github.com/cyrilakafia/feu-pipeline/blob/main/run_inf.py) for more details on how to use the pipeline
+
+Click the button below to quickly test the pipeline in google colab.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cyrilakafia/feu-pipeline/blob/main/feu_colab_demo.ipynb)
