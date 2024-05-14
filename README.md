@@ -8,12 +8,6 @@ Disclaimer: This algorithm and library is still under construction
 
 ## Installation
 
-Start by cloning this repository.
-
-```bash
-git clone https://github.com/cyrilakafia/feu-pipeline.git
-```
-
 Ensure you are working in an environt with PyTorch, numpy, matplotlib and pandas installed. We reccommend you create a new environment with conda and install these packages
 
 ```bash
@@ -22,6 +16,19 @@ conda activate feu
 cd feu-pipeline
 pip install -r requirements.txt
 ```
+
+After creating and activating your environment run the installation code below to install the feu module
+
+```bash
+pip install git+https://github.com/cyrilakafia/feu-pipeline.git
+```
+
+Alternatively, you can simply clone this repository.
+
+```bash
+git clone https://github.com/cyrilakafia/feu-pipeline.git
+```
+
 ## Data 
 
 The data processed by the pipeline is `two-dimensional time series data`, where the first dimension represents the variables to be clustered, and the second dimension represents the corresponding time series data/timepoints.
