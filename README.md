@@ -8,22 +8,21 @@ Disclaimer: This algorithm and library is still under construction
 
 ## Installation
 
-Ensure you are working in an environt with PyTorch, numpy, matplotlib and pandas installed. We reccommend you create a new environment with conda and install these packages
+We recommend you create a new environment with conda before installing the package. If you don't have conda installed, you can install it from [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html). Create a new environment using the code below.
 
 ```bash
-conda create -n 'feu' python=3.10
-conda activate feu
-cd feu-pipeline
-pip install -r requirements.txt
+conda create -n 'feu' python=3.10   # create a new environment
+conda activate feu      # activate the environment
+cd feu-pipeline     # navigate to the directory
 ```
-
-After creating and activating your environment run the installation code below to install the feu module
+Now you can install the package using the code below
 
 ```bash
 pip install git+https://github.com/cyrilakafia/feu-pipeline.git
 ```
 
-Alternatively, you can simply clone this repository.
+Alternatively, you can clone the repository and install the package locally.
+
 
 ```bash
 git clone https://github.com/cyrilakafia/feu-pipeline.git
