@@ -4,12 +4,12 @@ from feu.nssm import nssm_log_likelihood
 from feu.sb import infer_dp
 from feu.visualize_heatmap import viz_heatmap
 
-def run_inference(file, title, device, iterations, concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=100, seed=None):
+def run_inference(data, title, device, iterations, concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=100, seed=None):
     """
     Run the inference process on the given data.
 
     Parameters:
-    file (str): Path to the file containing the data to be processed.
+    data (str): Path to the file containing the data to be processed.
     title (str): Name for the run. Eg. 'rodent_5'
     device (str): Device to be used for PyTorch computation. Options: 'cpu', 'cuda'
     iterations (int): Number of iterations for the inference process.
@@ -39,7 +39,11 @@ def run_inference(file, title, device, iterations, concentration=1.0, max_cluste
     torch.set_default_dtype(torch.double)
     torch.set_default_device(device)
 
-    obs_all = torch.load(file, map_location=device)[0]
+    # check to see if data is file or tensor
+    if isinstance(data, str):
+        obs_all = torch.load(data, map_location=device)[0]
+    else:   
+        obs_all = data
     print("Device", obs_all.device)
 
     # base distribution (G)
