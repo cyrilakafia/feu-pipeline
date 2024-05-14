@@ -14,7 +14,7 @@ Start by cloning this repository.
 git clone https://github.com/cyrilakafia/feu-pipeline.git
 ```
 
-Ensure you are working in an environ with PyTorch, numpy, matplotlib and pandas install. We reccommend you create a new environment with conda and install these packages
+Ensure you are working in an environt with PyTorch, numpy, matplotlib and pandas installed. We reccommend you create a new environment with conda and install these packages
 
 ```bash
 conda create -n 'feu' python=3.10
