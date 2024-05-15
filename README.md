@@ -83,7 +83,7 @@ best_assigns, best_params = run_inference(
                                         iterations=1500,# number of iterations to run the model
                                         concentration=1,# probability of increasing the number of clusters. 1 is the default and 
                                         max_clusters=20,# maximum number of clusters to consider 
-                                        num_trials=1,   # number of trials to run the model  
+                                        num_trials=1,   # number of trials of the data
                                         t_stimulus=100,    # timepoint of stimulus. should be an int greater than 0. 
                                         seed=None       # seed for reproducibility
                                         )
