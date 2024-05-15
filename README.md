@@ -46,7 +46,7 @@ To use this codebase, follow the steps outlined below:
 1. Import the `run_inference` function from the `inf` module.
 
 ```python
-from inf import run_inference
+from feu.inf import run_inference
 from feu.prep import prep
 import os
 ```
@@ -84,7 +84,7 @@ best_assigns, best_params = run_inference(
                                         concentration=1,# probability of increasing the number of clusters. 1 is the default and 
                                         max_clusters=20,# maximum number of clusters to consider 
                                         num_trials=1,   # number of trials to run the model  
-                                        t_stimulus=0,    # timepoint of stimulus if there is one
+                                        t_stimulus=100,    # timepoint of stimulus. should be an int greater than 0. 
                                         seed=None       # seed for reproducibility
                                         )
 ```
