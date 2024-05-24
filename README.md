@@ -32,7 +32,9 @@ git clone https://github.com/cyrilakafia/feu-pipeline.git
 
 The data processed by the pipeline is `two-dimensional time series data`, where the first dimension represents the variables to be clustered, and the second dimension represents the corresponding time series data/timepoints.
 
-For example, consider electrophysiological data recorded from 25 neurons over a duration of 1000 seconds. Assuming that one measurement is recorded every second, the data will have a shape of (25, 1000). Each row corresponds to a different neuron, and each column represents sequential time points.
+For example, consider electrophysiological data (which the model works very well with) recorded from 25 neurons over a duration of 1000 seconds. Assuming that one measurement is recorded every second, the data will have a shape of (25, 1000). Each row corresponds to a different neuron, and each column represents sequential time points.
+
+The algorithm currently supports Binary data (Data with only 0s and 1s `eg. spike train data were 1=spike; 0=no spike`) and Count data (Data with only positive integers `eg. spike train data for multiple trials were positive int represents number of spikes across all trials`). 
 
 This structured data should be saved in a `PyTorch file with the .p` extension. Conversion from other data formats to the PyTorch format is supported within our pipeline, ensuring compatibility and ease of integration for various data sources. This structure facilitates the application of time series analysis or clustering algorithms on the dataset.
 
@@ -84,7 +86,7 @@ best_assigns, best_params = run_inference(
                                         concentration=1,# probability of increasing the number of clusters. 1 is the default and 
                                         max_clusters=20,# maximum number of clusters to consider 
                                         num_trials=1,   # number of trials of the data
-                                        t_stimulus=100,    # timepoint of stimulus. should be an int greater than 0. 
+                                        t_stimulus=100,    # timepoint of stimulus. if no stimulus, set to 0
                                         seed=None       # seed for reproducibility
                                         )
 ```
