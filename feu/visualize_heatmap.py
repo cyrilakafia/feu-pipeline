@@ -136,10 +136,25 @@ def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20)
     print(f'Saving cluster assignments heatmap to outputs/sim{run}_assigns.png')
 
     # make params figure
-    plt.scatter(average_params[:, 1] + 15, average_params[:, 0], s=20)
-    plt.xlabel('phasicity')
-    plt.ylabel('jump')
+    if max(best_assigns.iloc[0, :]) > 19:
+        color_palette = 'viridis'
+    else:
+        color_palette = 'tab20'
+
+    min_alpha = 0.7
+    max_alpha = 0.9
+
+    unique_clusters = np.unique(best_assigns.iloc[0, :])
+    num_clusters = len(unique_clusters)
+
+    alphas = min_alpha + (best_assigns.iloc[0, :] - unique_clusters.min()) * (max_alpha - min_alpha) / (num_clusters - 1)
+
+    plt.scatter(average_params[:, 1] + 15, average_params[:, 0], s=40, c=best_assigns.iloc[0, :], cmap=color_palette, edgecolors='k', alpha=alphas)
+    plt.xlabel('Phasicity')
+    plt.ylabel('Jump')
     plt.title('FEU Space')
+    cbar = plt.colorbar()
+    cbar.set_label('Cluster')
     plt.tight_layout()
     plt.savefig(f'outputs/sim{run}_params.png', dpi = 500)
     plt.close()
