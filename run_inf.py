@@ -48,5 +48,6 @@ num_trials = 100
 best_assigns, best_params = viz_heatmap('human_ephys_test4', 2641, 'outputs/simhuman_ephys_test4_assigns.csv', 'outputs/simhuman_ephys_test4_params.tsv', max_clusters=20)
 
 
+# Making rasters
 data = torch.load('outputs/human_ephys_trials.p', map_location=device)
 make_raster_fig(data, t_stimulus=500, best_assigns=best_assigns, title='human_ephys_test4')
