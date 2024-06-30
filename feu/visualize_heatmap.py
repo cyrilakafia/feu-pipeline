@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.patches as patches
 matplotlib.use('Agg')
 import pandas as pd
 import numpy as np
@@ -122,6 +123,14 @@ def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20)
     plt.yticks(np.arange(N), reorder, fontsize=5)
     plt.xticks(np.arange(N), reorder, fontsize=5, rotation=90)
     plt.tight_layout()
+
+    # Add chosen clustering in outline
+    counts = np.bincount(best_assigns.iloc[0, :])
+    start = -0.5
+    for c in counts:
+        rect = patches.Rectangle((start, start), c, c, linewidth=1, edgecolor='lime', facecolor='none')
+        start += c
+        plt.gca().add_patch(rect)
 
     if not os.path.exists('outputs'):
         os.makedirs('outputs')
