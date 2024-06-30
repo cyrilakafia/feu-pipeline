@@ -172,3 +172,69 @@ def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20)
 
     return best_assigns, best_params
 
+def plot_raster(raster, x_axis=None, ax=None, ms=10, offset=0):
+    plt.grid('off')
+    n_trials, trial_len = raster.shape
+    if x_axis is None:
+        x_axis = np.arange(trial_len)
+    for i in range(n_trials):
+        mask = (raster[i] > 0)
+        if ax:
+            ax.plot(x_axis[mask], (i+1+offset) * np.ones(mask.sum()), 'k.', markersize=ms)
+        else:
+            plt.plot(x_axis[mask], (i+1+offset) * np.ones(mask.sum()), 'k.', markersize=ms)
+
+def make_raster_fig(data, t_stimulus, best_assigns, title):
+    data_shape = data.values[0][0].shape
+    print(f'Data shape: {data_shape}')
+    x_axis = np.arange(-t_stimulus, data_shape[1]-t_stimulus)
+
+    unique_clusters = np.sort(np.unique(best_assigns.iloc[0, :]))
+    n_clusters = len(unique_clusters)
+    n_cols = 3
+    n_rows = int(np.ceil(n_clusters / n_cols))
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 5 * n_rows), sharex=False, sharey=False)
+    axes = axes.flatten()
+
+    for idx, k in enumerate(unique_clusters):
+        ax = axes[idx]
+        series = best_assigns.iloc[0, 1:]
+        ensemble = series[series == k]
+        ensemble_ids = ensemble.index.astype(int)
+        subset = data.iloc[ensemble_ids]
+        for raster in subset["data"]:
+            plot_raster(raster, ms=1, x_axis=x_axis, ax=ax)
+        ax.axvline(0, c='r')
+        ax.set_title(f'Cluster {k + 1}, Neuron Count: {len(subset)}')
+
+    # Hide unused subplots
+    for idx in range(n_clusters, len(axes)):
+        fig.delaxes(axes[idx])
+
+    plt.tight_layout()
+    plt.savefig(f'outputs/sim{title}_raster_clusters.png')
+    # plt.show()
+
+
+
+# Make rasters indepedently, 1 image for each cluster
+# def make_raster_fig(data, t_stimulus, best_assigns, title):
+
+#     data_shape = data.values[0][0].shape
+#     print(f'Data shape: {data_shape}')
+#     x_axis = np.arange(-t_stimulus, data_shape[1]-t_stimulus)
+
+#     for k in np.sort(np.unique(best_assigns.iloc[0, :])):
+#         plt.figure()
+
+#         series = best_assigns.iloc[0, 1:]
+#         ensemble = series[series == k]
+#         ensemble_ids = ensemble.index.astype(int)
+#         subset = data.iloc[ensemble_ids]
+#         for raster in subset["data"]:
+#             plot_raster(raster, ms=1, x_axis=x_axis)
+#         plt.axvline(0, c='r')
+#         plt.title(f'Cluster {k + 1}, Neuron Count: {len(subset)}')
+#         plt.savefig(f'outputs/sim{title}_raster_cluster_{k+1}.png')
+#         # plt.show()

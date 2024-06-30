@@ -2,7 +2,9 @@ import torch
 from torch.distributions import Uniform, Normal
 from feu.nssm import nssm_log_likelihood
 from feu.sb import infer_dp
-from feu.visualize_heatmap import viz_heatmap
+from feu.visualize_heatmap import viz_heatmap, plot_raster, make_raster_fig
+import numpy as np
+import matplotlib.pyplot as plt
 
 def run_inference(data, title, device, iterations, concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, seed=None):
     """
@@ -130,8 +132,15 @@ def run_inference(data, title, device, iterations, concentration=1.0, max_cluste
     # print(f'Title of {title}, Iterations {iterations}')
     print(f'{title} run for {iterations} iterations - Inference done')
     best_assings, best_params = viz_heatmap(title, iterations, max_clusters=max_clusters)
-    print('Pipeline done')
-    return best_assings, best_params
 
+    #Viz rasters
+
+    # if t_stimulus > 0:
+
+    #     make_raster_fig(obs_all, t_stimulus=t_stimulus, best_assigns=best_assings, title=title)
+
+    print('Pipeline done')
+
+    return best_assings, best_params
 # # Example of how to call the function
 # output = run_inference('outputs/sim1231_true.p', '1', 'cpu', 1500, 1.0)
