@@ -199,14 +199,14 @@ def make_raster_fig(data, t_stimulus, best_assigns, title):
 
     for idx, k in enumerate(unique_clusters):
         ax = axes[idx]
-        series = best_assigns.iloc[0, 1:]
+        series = best_assigns.iloc[0, 0:]
         ensemble = series[series == k]
         ensemble_ids = ensemble.index.astype(int)
         subset = data.iloc[ensemble_ids]
         for raster in subset["data"]:
             plot_raster(raster, ms=1, x_axis=x_axis, ax=ax)
         ax.axvline(0, c='r')
-        ax.set_title(f'Cluster {k + 1}, Neuron Count: {len(subset)}')
+        ax.set_title(f'Cluster {k}, Neuron Count: {len(subset)}')
 
     # Hide unused subplots
     for idx in range(n_clusters, len(axes)):
