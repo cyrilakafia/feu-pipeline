@@ -109,7 +109,7 @@ def prep_torch(data, dst):
     print('Preprocessing done')
 
 def prep_csv(data, dst):
-    df = pd.read_csv(data)
+    df = pd.read_csv(data, header=None)
     x = df.to_numpy()
     x_tensor = torch.from_numpy(x)
     x_tensor = (x_tensor, )
@@ -118,7 +118,7 @@ def prep_csv(data, dst):
     print('Preprocessing done')
 
 def prep_xlsx(data, dst):
-    df = pd.read_excel(data)
+    df = pd.read_excel(data, header=None)
     x = df.to_numpy()
     x_tensor = torch.from_numpy(x)
     x_tensor = (x_tensor, )
