@@ -24,7 +24,7 @@ def ids_to_coo(ids):
         coo[np.ix_(mask, mask)] = 1
     return coo
 
-def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20):
+def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20, figures=True):
     '''
     Visualize the cluster assignments as a heatmap
 
@@ -114,61 +114,65 @@ def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20)
 
     reorder = assigns.loc[min_dist_idx].sort_values().index
 
-    # plot cluster assignments
-    plt.imshow(mean_coo[np.ix_(reorder, reorder)], cmap="coolwarm")
-    plt.colorbar()
+    if figures:
+        # plot cluster assignments
+        plt.imshow(mean_coo[np.ix_(reorder, reorder)], cmap="coolwarm")
+        plt.colorbar()
 
-    N = len(assigns.columns)
+        N = len(assigns.columns)
 
-    plt.yticks(np.arange(N), reorder, fontsize=5)
-    plt.xticks(np.arange(N), reorder, fontsize=5, rotation=90)
-    plt.tight_layout()
+        plt.yticks(np.arange(N), reorder, fontsize=5)
+        plt.xticks(np.arange(N), reorder, fontsize=5, rotation=90)
+        plt.tight_layout()
 
-    # Add chosen clustering in outline
-    counts = np.bincount(best_assigns.iloc[0, :])
-    start = -0.5
-    for c in counts:
-        rect = patches.Rectangle((start, start), c, c, linewidth=1, edgecolor='lime', facecolor='none')
-        start += c
-        plt.gca().add_patch(rect)
+        # Add chosen clustering in outline
+        counts = np.bincount(best_assigns.iloc[0, :])
+        start = -0.5
+        for c in counts:
+            rect = patches.Rectangle((start, start), c, c, linewidth=1, edgecolor='lime', facecolor='none')
+            start += c
+            plt.gca().add_patch(rect)
 
-    if not os.path.exists('outputs'):
-        os.makedirs('outputs')
-    if not os.path.exists(f'outputs/sim{run}_assigns.png'):
-        plt.savefig(f'outputs/sim{run}_assigns.png', dpi = 500)
-    else:
-        oldfile = f'sim{run}_assigns.png'
-        os.remove(f'outputs/{oldfile}')
-        plt.savefig(f'outputs/sim{run}_assigns.png', dpi = 500)
-        
-    plt.close()
-    print(f'Saving cluster assignments heatmap to outputs/sim{run}_assigns.png')
+        if not os.path.exists('outputs'):
+            os.makedirs('outputs')
+        if not os.path.exists(f'outputs/sim{run}_assigns.png'):
+            plt.savefig(f'outputs/sim{run}_assigns.png', dpi = 500)
+        else:
+            oldfile = f'sim{run}_assigns.png'
+            os.remove(f'outputs/{oldfile}')
+            plt.savefig(f'outputs/sim{run}_assigns.png', dpi = 500)
+            
+        plt.close()
+        print(f'Saving cluster assignments heatmap to outputs/sim{run}_assigns.png')
 
-    # make params figure
-    if max(best_assigns.iloc[0, :]) > 19:
-        color_palette = 'viridis'
-    else:
-        color_palette = 'tab20'
+        # make params figure
+        if max(best_assigns.iloc[0, :]) > 19:
+            color_palette = 'viridis'
+        else:
+            color_palette = 'tab20'
 
-    min_alpha = 0.7
-    max_alpha = 0.9
+        min_alpha = 0.7
+        max_alpha = 0.9
 
-    unique_clusters = np.unique(best_assigns.iloc[0, :])
-    num_clusters = len(unique_clusters)
+        unique_clusters = np.unique(best_assigns.iloc[0, :])
+        num_clusters = len(unique_clusters)
 
-    alphas = min_alpha + (best_assigns.iloc[0, :] - unique_clusters.min()) * (max_alpha - min_alpha) / (num_clusters - 1)
+        if num_clusters == 1:
+            alphas = 0.9
 
-    plt.scatter(average_params[:, 1] + 15, average_params[:, 0], s=40, c=best_assigns.iloc[0, :], cmap=color_palette, edgecolors='k', alpha=alphas)
-    plt.xlabel('Phasicity')
-    plt.ylabel('Jump')
-    plt.title('FEU Space')
-    cbar = plt.colorbar()
-    cbar.set_label('Cluster')
-    plt.tight_layout()
-    plt.savefig(f'outputs/sim{run}_params.png', dpi = 500)
-    plt.close()
-    print(f'Saving scatter plot of cluster parameters to outputs/sim{run}_params.png')
+        else:
+            alphas = min_alpha + (best_assigns.iloc[0, :] - unique_clusters.min()) * (max_alpha - min_alpha) / (num_clusters - 1)
 
+        plt.scatter(average_params[:, 1] + 15, average_params[:, 0], s=40, c=best_assigns.iloc[0, :], cmap=color_palette, edgecolors='k', alpha=alphas)
+        plt.xlabel('Phasicity')
+        plt.ylabel('Jump')
+        plt.title('FEU Space')
+        cbar = plt.colorbar()
+        cbar.set_label('Cluster')
+        plt.tight_layout()
+        plt.savefig(f'outputs/sim{run}_params.png', dpi = 500)
+        plt.close()
+        print(f'Saving scatter plot of cluster parameters to outputs/sim{run}_params.png')
 
     return best_assigns, best_params
 

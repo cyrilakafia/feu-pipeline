@@ -6,7 +6,7 @@ from feu.visualize_heatmap import viz_heatmap, plot_raster, make_raster_fig
 import numpy as np
 import matplotlib.pyplot as plt
 
-def run_inference(data, title, device, iterations, concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, seed=None):
+def run_inference(data, title, device, iterations, concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, seed=None, figures=True):
     """
     Run the inference process on the given data.
 
@@ -19,6 +19,7 @@ def run_inference(data, title, device, iterations, concentration=1.0, max_cluste
     max_clusters (int, optional): Maximum number of clusters for the Dirichlet Process. Defaults to 20.
     t_stimulus (int, optional): Timepoint for stimulus. If there is no stimulus in the data, set this to 0.
     seed (int, optional): Seed for the random number generator. Defaults to None.
+    figures (bool, optional): Whether to generate figures. Defaults to True.
 
     Returns:
     tuple: The best assignments and parameters resulting from the inference process.
@@ -131,7 +132,7 @@ def run_inference(data, title, device, iterations, concentration=1.0, max_cluste
 
     # print(f'Title of {title}, Iterations {iterations}')
     print(f'{title} run for {iterations} iterations - Inference done')
-    best_assings, best_params = viz_heatmap(title, iterations, max_clusters=max_clusters)
+    best_assings, best_params = viz_heatmap(title, iterations, max_clusters=max_clusters, figures=figures)
 
     #Viz rasters
 
