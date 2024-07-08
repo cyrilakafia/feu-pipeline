@@ -6,47 +6,47 @@ import torch
 import pandas as pd
 import numpy as np
 
-original_data = 'test_data/array_30_200.pkl'
+# original_data = 'test_data/array_30_200.pkl'
 
-# Preprocess the data
-preprocessed_data = 'outputs/processed_data.p'
+# # Preprocess the data
+# preprocessed_data = 'outputs/processed_data.p'
 
-if not os.path.exists('outputs'):
-    os.makedirs('outputs')
+# if not os.path.exists('outputs'):
+#     os.makedirs('outputs')
 
-prep(original_data, preprocessed_data)
+# prep(original_data, preprocessed_data)
 
-# Run the inference process
-title = 'demo_run'
-device = 'cpu'
-num_iterations = 5
-conc = 1
-max_clusters = 20
-stimulus_timepoint = 1
-num_trials = 100
+# # Run the inference process
+# title = 'demo_run'
+# device = 'cpu'
+# num_iterations = 5
+# conc = 1
+# max_clusters = 20
+# stimulus_timepoint = 1
+# num_trials = 100
 
 
-best_assigns, best_params = run_inference(
-                                        preprocessed_data,
-                                        title=title, 
-                                        device=device,
-                                        iterations=num_iterations,
-                                        concentration=conc, 
-                                        max_clusters=max_clusters,
-                                        num_trials=num_trials,
-                                        t_stimulus=stimulus_timepoint,
-                                        seed=None,
-                                        figures=True)
+# best_assigns, best_params = run_inference(
+#                                         preprocessed_data,
+#                                         title=title, 
+#                                         device=device,
+#                                         iterations=num_iterations,
+#                                         concentration=conc, 
+#                                         max_clusters=max_clusters,
+#                                         num_trials=num_trials,
+#                                         t_stimulus=stimulus_timepoint,
+#                                         seed=None,
+#                                         figures=True)
 
-print(type(best_assigns))
-print(type(best_params))
+# print(type(best_assigns))
+# print(type(best_params))
 
 # <class 'pandas.core.frame.DataFrame'>
 # <class 'pandas.core.frame.DataFrame'>
 
 # Assuming you have already run the inference process, you can find best assignment and paramsn and visualize the results using the following code:
 
-# best_assigns, best_params = viz_heatmap('human_ephys_test4', 2641, 'outputs/simhuman_ephys_test4_assigns.csv', 'outputs/simhuman_ephys_test4_params.tsv', max_clusters=20)
+best_assigns, best_params = viz_heatmap('human_ephys_test4', 2641, 'outputs/simhuman_ephys_test4_assigns.csv', 'outputs/simhuman_ephys_test4_params.tsv', max_clusters=20)
 
 
 # Making rasters
