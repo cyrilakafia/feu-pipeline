@@ -8,20 +8,19 @@ Disclaimer: This algorithm and library is still under construction
 
 ## Installation
 
-We recommend you create a new environment with conda before installing the package. If you don't have conda installed, you can install it from [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html). Create a new environment using the code below.
+We recommend you create a new environment with conda before installing the package. If you don't have conda installed, you can install it from [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html). Create a new environment using the terminal commands below.
 
 ```bash
 conda create -n 'feu' python=3.10   # create a new environment
 conda activate feu      # activate the environment
-cd feu-pipeline     # navigate to the directory
 ```
-Now you can install the package using the code below
+Now you can install the package using the terminal command below
 
 ```bash
-pip install git+https://github.com/cyrilakafia/feu-pipeline.git
+pip install -U git+https://github.com/cyrilakafia/feu-pipeline.git
 ```
 
-Alternatively, you can clone the repository and install the package locally.
+Alternatively, you can clone the repository.
 
 
 ```bash
@@ -32,26 +31,11 @@ git clone https://github.com/cyrilakafia/feu-pipeline.git
 
 The data processed by the pipeline is `two-dimensional time series data`, where the first dimension represents the variables to be clustered, and the second dimension represents the corresponding time series data/timepoints.
 
-For example, consider electrophysiological data (which the model works very well with) recorded from 25 neurons over a duration of 1000 seconds. Assuming that one measurement is recorded every second, the data will have a shape of (25, 1000). Each row corresponds to a different neuron, and each column represents sequential time points.
+For example, consider electrophysiological data (which the model works very well with) recorded from 25 neurons over a duration of 1000 seconds. Assuming that the data is binned at every second , the data will have a shape of (25, 1000). Each row corresponds to a different neuron, and each column represents sequential time points.
 
-The algorithm currently supports Binary data (Data with only 0s and 1s `eg. spike train data were 1=spike; 0=no spike`) and Count data (Data with only positive integers `eg. spike train data for multiple trials were positive int represents number of spikes across all trials`). 
+The algorithm currently supports Binary data (Data with only 0s and 1s `eg. spike train data where 1=spike; 0=no spike`) and Count data (Data with only positive integers `eg. spike train data for multiple trials where positive int represents number of spikes across all trials`). 
 
-This structured data should be saved in a `PyTorch file with the .p` extension. Conversion from other data formats to the PyTorch format is supported within our pipeline, ensuring compatibility and ease of integration for various data sources. This structure facilitates the application of time series analysis or clustering algorithms on the dataset.
-
-To test the code, run `python sim.py --seed 1231` in a terminal environment.  You can modify the computing device with the `--device` flag (default is `cpu`).  
-
-
-## Usage
-
-To use this codebase, follow the steps outlined below:
-
-1. Import the `run_inference` function from the `inf` module.
-
-```python
-from feu.inf import run_inference
-from feu.prep import prep
-import os
-```
+This structured data should be saved in a `PyTorch file with the .p` extension. Conversion from other data formats to the PyTorch format is supported within our pipeline, ensuring compatibility and ease of integration for various data sources. 
 
 We handle conversion to PyTorch file from other formats listed below:
 
@@ -62,6 +46,22 @@ We handle conversion to PyTorch file from other formats listed below:
 - .csv
 - .xlsx
 - .nwb [TODO]
+
+To test the module, run `python sim.py --seed 1231` in a terminal environment.  You can modify the computing device with the `--device` flag (default is `cpu`).
+This will simulate and apply FEU to a new dataset.  
+
+
+## Usage
+
+To apply FEU to your data, follow the steps outlined below:
+
+1. Import the `run_inference` and `prep` functions.
+
+```python
+from feu.inf import run_inference
+from feu.prep import prep
+import os
+```
 
 2. Preprocess the data
 ```python
