@@ -46,20 +46,8 @@ def run_inference(data, title, device, iterations, concentration=1.0, max_cluste
         obs_all = data
     print("Device", obs_all.device)
 
-    if ',' in str(num_trials):
-        num_trials = [int(i) for i in str(num_trials).split(',')]
-        num_trials = torch.tensor(num_trials)
-        
-        # Make sure length of num_trials list is the same as the number of timeseries
-        if len(num_trials) != obs_all.shape[0]:
-            print('Number of trials must be the same as the number of timeseries, using the max of the list provided')
-            num_trials = int(np.max(num_trials))
-            print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Number of trials {str(num_trials)} Stimulus Timepoint {t_stimulus}, Seed {seed}')
-        else:
-            print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Varying number of trials, Stimulus Timepoint {t_stimulus}, Seed {seed}')
-
     # Else if number of trials is a regular python list or a numpy array
-    elif isinstance(num_trials, list) or isinstance(num_trials, np.ndarray):
+    if isinstance(num_trials, list) or isinstance(num_trials, np.ndarray):
         num_trials = torch.tensor(num_trials)
         print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Varying number of trials i.e list, Stimulus Timepoint {t_stimulus}, Seed {seed}')
     
