@@ -47,7 +47,7 @@ def run_inference(data, title, device, iterations, concentration=1.0, max_cluste
     print("Device", obs_all.device)
 
     if ',' in str(num_trials):
-        num_trials = [int(i) for i in num_trials.split(',')]
+        num_trials = [int(i) for i in str(num_trials).split(',')]
         num_trials = torch.tensor(num_trials)
         
         # Make sure length of num_trials list is the same as the number of timeseries
