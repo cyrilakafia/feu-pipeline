@@ -12,6 +12,7 @@ import os.path
 # Run DPnSSM inference algorithm
 def infer_dp(
     obs: Tensor,
+    num_trials: Tensor,
     calc_log_like: Callable[[Tensor, Tensor, Tensor], Tensor],
     concentration: float,
     samp_base: Callable[[int], Tensor],
@@ -86,8 +87,10 @@ def infer_dp(
             .flatten(0, 1)
         )
 
+        num_trials_ = (num_trials).unsqueeze(dim=1).expand((-1, max_clusters)).flatten(0, 1)
+
         # Compute cluster likelihoods
-        log_likelihoods = calc_log_like(obs_, params_, data_ids_).unflatten(
+        log_likelihoods = calc_log_like(obs_, params_, data_ids_, num_trials_).unflatten(
             dim=0, sizes=(num_obs, num_clusters)
         )
 
@@ -140,6 +143,7 @@ def infer_dp(
             obs,
             params_prop[active_cluster_ids],
             torch.arange(num_obs, device=obs.device),
+            num_trials,
         )
         params_curr_loglikes = torch.bincount(
             active_cluster_ids, weights=params_curr_loglikes
