@@ -47,7 +47,7 @@ We handle conversion to PyTorch file from other formats listed below:
 - .xlsx
 - .nwb [TODO]
 
-To test the module, run `python sim.py --seed 1231` in a terminal environment.  You can modify the computing device with the `--device` flag (default is `cpu`).
+To test the module, run `python .py --seed 1231` in a terminal environment.  You can modify the computing device with the `--device` flag (default is `cpu`).
 This will simulate and apply FEU to a new dataset.  
 
 
@@ -62,36 +62,48 @@ from feu.inf import run_inference
 from feu.prep import prep
 import os
 ```
-
-2. Preprocess the data
+2. Define the parameters
 ```python
-original_data = 'test_data/array_30_200.pkl'    # path to the data
+# Define the parameters
+title = 'demo'
+device = 'cpu'  #or 'cuda'
+num_iters = 1500
+conc = 1
+max_clusters = 20
+stimulus_timepoint = 200 #if no stimulus, set to 0
+num_trials = 100
+```
 
-preprocessed_data = 'outputs/processed_data.p'  # path to save the preprocessed data
+3. Preprocess the data
+```python
+original_data = 'test_data/array_30_200.pkl'
 
-if not os.path.exists('outputs'):
-    os.makedirs('outputs')
+preprocessed_data = f'{title}/processed_data.p'
+
+if not os.path.exists(title):
+    os.makedirs(title)
 
 prep(original_data, preprocessed_data)
 ```
 
-3. Execute the `run_inference` function with the necessary parameters.
+4. Execute the `run_inference` function with the necessary parameters.
 
 ```python
 best_assigns, best_params = run_inference(
                                         preprocessed_data,
-                                        title='demo',   # title of the run
-                                        device='cpu',   # device to run the model on (cpu or cuda)
-                                        iterations=1500,# number of iterations to run the model
-                                        concentration=1,# probability of increasing the number of clusters. 1 is the default and 
-                                        max_clusters=20,# maximum number of clusters to consider 
-                                        num_trials=1,   # number of trials of the data
-                                        t_stimulus=100,    # timepoint of stimulus. if no stimulus, set to 0
-                                        seed=None       # seed for reproducibility
+                                        title=title,   # title of the run
+                                        device=device,   # device to run the model on (cpu or cuda)
+                                        iterations=num_iters,# number of iterations to run the model
+                                        concentration=conc,# probability of increasing the number of clusters. 1 is the default and 
+                                        max_clusters=max_clusters,# maximum number of clusters to consider 
+                                        num_trials=num_trials,   # number of trials of the data
+                                        t_stimulus=stimulus_timepoint,    # timepoint of stimulus. if no stimulus, set to 0
+                                        seed=None,       # seed for reproducibility
+                                        figures=True,    # whether to generate figures
                                         )
 ```
 
-3. Print the data types of the outputs to verify.
+5. Print the data types of the outputs to verify.
 
 ```python
 print(type(best_assigns))
@@ -102,14 +114,12 @@ print(type(best_params))
 
 Running the `run_inference` function generates the following outputs:
 
-- **Best Cluster Assignments CSV:** Saves the best cluster assignments to `outputs/sim{run}_best_assigns.csv`.
-- **Best Cluster Parameters CSV:** Saves the best cluster parameters to `outputs/sim{run}_best_params.csv`.
-- **Scatter Plot PNG:** Saves a scatter plot of the cluster parameters to `outputs/sim{run}_params.png`.
-- **Heatmap PNG:** Saves a heatmap of the cluster assignments to `outputs/sim{run}_assigns.png`.
-- **Cluster Assignments CSV:** Saves the cluster assignments to `outputs/sim{run}_assigns.csv`.
-- **Cluster Parameters CSV:** Saves the cluster parameters to `outputs/sim{run}_params.csv`.
-
-These outputs are stored in the `outputs` directory, allowing easy access and analysis of the results.
+- **Best Cluster Assignments CSV:** Saves the best cluster assignments to `title/{run}_best_assigns.csv`.
+- **Best Cluster Parameters CSV:** Saves the best cluster parameters to `title/{run}_best_params.csv`.
+- **Scatter Plot PNG:** Saves a scatter plot of the cluster parameters to `title/{run}_params.png`.
+- **Heatmap PNG:** Saves a heatmap of the cluster assignments to `title/{run}_assigns.png`.
+- **Cluster Assignments CSV:** Saves the cluster assignments to `title/{run}_assigns.csv`.
+- **Cluster Parameters CSV:** Saves the cluster parameters to `title/{run}_params.csv`.
 
 Assuming you have already run the inference process but visualizations and best assign/paramaters didn't run, you can find best assignment and paramaters and visualize the results using the following code:
 
