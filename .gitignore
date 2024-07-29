@@ -1,6 +1,8 @@
 # Output folder
 outputs/
 
+test_feu.py
+
 # Test data folder
 test_data/
 

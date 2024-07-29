@@ -96,7 +96,7 @@ def run_inference(data, title, device, iterations, concentration=1.0, max_cluste
         )
     
     # If there is no stimulus in the data
-    def calc_bssm_log_like_sim_no_stim(obs, params, ns):
+    def calc_bssm_log_like_sim_no_stim(obs, params, ns, num_trials):
         jumps = params[:, 0]
         log_vars = params[:, 1]
         variances = torch.exp(log_vars)
