@@ -24,12 +24,12 @@ def ids_to_coo(ids):
         coo[np.ix_(mask, mask)] = 1
     return coo
 
-def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20, figures=True):
+def viz_heatmap(title, iter, assigns_df = None, params_df = None, max_clusters=20, figures=True):
     '''
     Visualize the cluster assignments as a heatmap
 
     Args:
-    run (str): the run number
+    title (str): the title number
     iter (int): the number of iterations
     assigns (pd.DataFrame): the cluster assignments
     params (pd.DataFrame): the cluster parameters
@@ -40,24 +40,24 @@ def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20,
     best_assigns (pd.DataFrame): the best cluster assignments
     best_params (pd.DataFrame): the best cluster parameters
     
-    Saves best cluster assignments to outputs/sim{run}_best_assigns.csv
-    Saves best cluster parameters to outputs/sim{run}_best_params.csv
-    Saves a scatter plot of cluster parameters to outputs/sim{run}_params.png
-    Saves a heatmap of the cluster assignments to outputs/sim{run}_assigns.png
+    Saves best cluster assignments to {title}/{title}_best_assigns.csv
+    Saves best cluster parameters to {title}/{title}_best_params.csv
+    Saves a scatter plot of cluster parameters to {title}/{title}_params.png
+    Saves a heatmap of the cluster assignments to {title}/{title}_assigns.png
     '''
 
     if iter < 510:
         if assigns_df is None or params_df is None:
-            assigns = pd.read_csv(f"outputs/sim{run}_assigns.csv", header=None)
-            params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
+            assigns = pd.read_csv(f"{title}/{title}_assigns.csv", header=None)
+            params = pd.read_csv(f"{title}/{title}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
         else:
             assigns = pd.read_csv(f"{assigns_df}", header=None)
             params = pd.read_csv(f"{params_df}", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
 
     else:
         if assigns_df is None or params_df is None:
-            assigns = pd.read_csv(f"outputs/sim{run}_assigns.csv", header=None).iloc[500:].reset_index(drop=True)
-            params = pd.read_csv(f"outputs/sim{run}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
+            assigns = pd.read_csv(f"{title}/{title}_assigns.csv", header=None).iloc[500:].reset_index(drop=True)
+            params = pd.read_csv(f"{title}/{title}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
         else:
             assigns = pd.read_csv(f"{assigns_df}", header=None).iloc[500:].reset_index(drop=True)
             params = pd.read_csv(f"{params_df}", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
@@ -102,15 +102,15 @@ def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20,
     # save params to file
     best_params = pd.DataFrame(average_params)
     best_params.columns = ['jump', 'phasicity']
-    best_params.to_csv(f'outputs/sim{run}_best_params.csv')
-    print(f'Found best parameters. Saving to file to outputs/sim{run}_best_params.csv')
+    best_params.to_csv(f'{title}/{title}_best_params.csv')
+    print(f'Found best parameters. Saving to file to {title}/{title}_best_params.csv')
 
     # rotate the df
     best_assigns = best_assigns.T
 
     # save best_assigns to csv file
-    best_assigns.to_csv(f'outputs/sim{run}_best_assigns.csv')
-    print(f'Found best assigns. Saving to file to outputs/sim{run}_best_assigns.csv')
+    best_assigns.to_csv(f'{title}/{title}_best_assigns.csv')
+    print(f'Found best assigns. Saving to file to {title}/{title}_best_assigns.csv')
 
     reorder = assigns.loc[min_dist_idx].sort_values().index
 
@@ -133,17 +133,17 @@ def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20,
             start += c
             plt.gca().add_patch(rect)
 
-        if not os.path.exists('outputs'):
-            os.makedirs('outputs')
-        if not os.path.exists(f'outputs/sim{run}_assigns.png'):
-            plt.savefig(f'outputs/sim{run}_assigns.png', dpi = 500)
+        if not os.path.exists(f'{title}'):
+            os.makedirs(f'{title}')
+        if not os.path.exists(f'{title}/{title}_assigns.png'):
+            plt.savefig(f'{title}/{title}_assigns.png', dpi = 500)
         else:
-            oldfile = f'sim{run}_assigns.png'
-            os.remove(f'outputs/{oldfile}')
-            plt.savefig(f'outputs/sim{run}_assigns.png', dpi = 500)
+            oldfile = f'{title}_assigns.png'
+            os.remove(f'{title}/{oldfile}')
+            plt.savefig(f'{title}/{title}_assigns.png', dpi = 500)
             
         plt.close()
-        print(f'Saving cluster assignments heatmap to outputs/sim{run}_assigns.png')
+        print(f'Saving cluster assignments heatmap to {title}/{title}_assigns.png')
 
         # make params figure
         if max(best_assigns.iloc[0, :]) > 19:
@@ -170,9 +170,9 @@ def viz_heatmap(run, iter, assigns_df = None, params_df = None, max_clusters=20,
         cbar = plt.colorbar()
         cbar.set_label('Cluster')
         plt.tight_layout()
-        plt.savefig(f'outputs/sim{run}_params.png', dpi = 500)
+        plt.savefig(f'{title}/{title}_params.png', dpi = 500)
         plt.close()
-        print(f'Saving scatter plot of cluster parameters to outputs/sim{run}_params.png')
+        print(f'Saving scatter plot of cluster parameters to {title}/{title}_params.png')
 
     return best_assigns, best_params
 
@@ -217,7 +217,7 @@ def make_raster_fig(data, t_stimulus, best_assigns, title):
         fig.delaxes(axes[idx])
 
     plt.tight_layout()
-    plt.savefig(f'outputs/sim{title}_raster_clusters.png')
+    plt.savefig(f'{title}/{title}_raster_clusters.png')
     # plt.show()
 
 
@@ -240,5 +240,5 @@ def make_raster_fig(data, t_stimulus, best_assigns, title):
 #             plot_raster(raster, ms=1, x_axis=x_axis)
 #         plt.axvline(0, c='r')
 #         plt.title(f'Cluster {k + 1}, Neuron Count: {len(subset)}')
-#         plt.savefig(f'outputs/sim{title}_raster_cluster_{k+1}.png')
+#         plt.savefig(f'{title}/{title}_raster_cluster_{k+1}.png')
 #         # plt.show()

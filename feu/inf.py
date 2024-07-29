@@ -6,7 +6,7 @@ from feu.visualize_heatmap import viz_heatmap, plot_raster, make_raster_fig
 import numpy as np
 import matplotlib.pyplot as plt
 
-def run_inference(data, title, device, iterations, concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, seed=None, figures=True):
+def run_inference(data, device, iterations, title='outputs', concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, seed=None, figures=True):
     """
     Run the inference process on the given data.
 
@@ -120,7 +120,7 @@ def run_inference(data, title, device, iterations, concentration=1.0, max_cluste
             base_logpdf,
             num_gibbs_iters=iterations,
             samp_prop=samp_prop,
-            out_prefix=f"outputs/sim{title}",
+            out_prefix=f"{title}/{title}",
             max_clusters=max_clusters,
             seed=seed,
         )
@@ -135,7 +135,7 @@ def run_inference(data, title, device, iterations, concentration=1.0, max_cluste
             base_logpdf,
             num_gibbs_iters=iterations,
             samp_prop=samp_prop,
-            out_prefix=f"outputs/sim{title}",
+            out_prefix=f"{title}/{title}",
             max_clusters=max_clusters,
             seed=seed,
         )
