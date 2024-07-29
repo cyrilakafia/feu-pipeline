@@ -6,25 +6,25 @@ import torch
 import pandas as pd
 import numpy as np
 
-original_data = 'test_data/array_30_200.pkl'
-
-# Preprocess the data
-preprocessed_data = 'outputs/processed_data.p'
-
-if not os.path.exists('outputs'):
-    os.makedirs('outputs')
-
-prep(original_data, preprocessed_data)
-
 # Run the inference process
-title = 'demo_run'
+title = 'demo'
 device = 'cpu'
 num_iterations = 5
 conc = 1
 max_clusters = 20
-stimulus_timepoint = 1
+stimulus_timepoint = 0
 num_trials = 100
 # num_trials = np.arange(100, 130)
+
+original_data = 'test_data/array_30_200.pkl'
+
+# Preprocess the data
+preprocessed_data = f'{title}/processed_data.p'
+
+if not os.path.exists(title):
+    os.makedirs(title)
+
+prep(original_data, preprocessed_data)
 
 print(type(num_trials))
 
