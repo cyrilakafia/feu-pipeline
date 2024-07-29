@@ -6,7 +6,7 @@ import torch
 import pandas as pd
 import numpy as np
 
-# Run the inference process
+# Define the parameters
 title = 'demo'
 device = 'cpu'
 num_iterations = 5
