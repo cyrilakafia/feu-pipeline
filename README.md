@@ -8,13 +8,13 @@ Disclaimer: This algorithm and library is still under construction
 
 ## Installation
 
-We recommend you create a new environment with conda before installing the package. If you don't have conda installed, you can install it from [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html). Create a new environment using the terminal commands below.
+We recommend you create a new environment with conda before installing the package. If you don't have conda installed, you can install it from [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html). Create a new environment using the commands below.
 
 ```bash
 conda create -n 'feu' python=3.10   # create a new environment
 conda activate feu      # activate the environment
 ```
-Now you can install the package using the terminal command below
+Now you can install the package using the command below
 
 ```bash
 pip install -U git+https://github.com/cyrilakafia/feu-pipeline.git
@@ -31,9 +31,11 @@ git clone https://github.com/cyrilakafia/feu-pipeline.git
 
 The data processed by the pipeline is `two-dimensional time series data`, where the first dimension represents the variables to be clustered, and the second dimension represents the corresponding time series data/timepoints.
 
-For example, consider electrophysiological data (which the model works very well with) recorded from 25 neurons over a duration of 1000 seconds. Assuming that the data is binned at every second , the data will have a shape of (25, 1000). Each row corresponds to a different neuron, and each column represents sequential time points.
+For example, consider electrophysiological data recorded from 25 neurons over a duration of 1000 seconds. Assuming that the data is binned at every second , the data will have a shape of (25, 1000). Each row corresponds to a different neuron, and each column represents sequential time points.
 
 The algorithm currently supports Binary data (Data with only 0s and 1s `eg. spike train data where 1=spike; 0=no spike`) and Count data (Data with only positive integers `eg. spike train data for multiple trials where positive int represents number of spikes across all trials`). 
+
+You can use the algorithm with other data types but this is not recommended. 
 
 This structured data should be saved in a `PyTorch file with the .p` extension. Conversion from other data formats to the PyTorch format is supported within our pipeline, ensuring compatibility and ease of integration for various data sources. 
 
@@ -47,8 +49,7 @@ We handle conversion to PyTorch file from other formats listed below:
 - .xlsx
 - .nwb [TODO]
 
-To test the module, run `python .py --seed 1231` in a terminal environment.  You can modify the computing device with the `--device` flag (default is `cpu`).
-This will simulate and apply FEU to a new dataset.  
+To test the module, run the file `sim_test.py`. This will simulate and apply FEU to a new dataset.  
 
 
 ## Usage
