@@ -2,7 +2,6 @@ import torch
 import numpy as np
 import pickle
 import pandas as pd
-import pynwb
 
 torch.set_default_dtype(torch.double)
 

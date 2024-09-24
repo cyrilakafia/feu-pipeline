@@ -7,7 +7,7 @@ from torch.distributions import Categorical, Normal, Beta
 from torch.nn.functional import pad
 import numpy as np
 import os.path
-
+import logging
 
 # Run DPnSSM inference algorithm
 def infer_dp(
@@ -23,6 +23,7 @@ def infer_dp(
     out_prefix: Optional[str] = None,
     seed: Optional[int] = None,
 ):
+    
     settings = {"dtype": obs.dtype, "device": obs.device}
 
     # Set seed for reproducible results
@@ -63,7 +64,27 @@ def infer_dp(
         # ):
         #     raise ValueError(f"There already exists a file with prefix {out_prefix}.")
 
-    for i in range(num_gibbs_iters):
+         # Congifure logging
+        logging.basicConfig(level=logging.INFO, 
+                            format='%(message)s',
+                            handlers=[
+                                logging.FileHandler(out_prefix + "_iteration_log.txt"),
+                                logging.StreamHandler()
+                            ])
+
+        logging.info("Starting DPnSSM inference algorithm")
+        # log the current date and time
+        logging.info(time.strftime("%c"))
+        logging.info("===================================")
+        logging.info("Parameters:")
+        if isinstance(num_trials, list) or isinstance(num_trials, np.ndarray):
+            logging.info(f'Title: {out_prefix}, Iterations: {num_gibbs_iters}, Max clusters: {max_clusters}, Seed: {seed}')
+            logging.info(f'Varying number of trials i.e list')
+        else:
+            logging.info(f'Title: {out_prefix}, Iterations: {num_gibbs_iters}, Max clusters: {max_clusters}, Number of trials: {str(num_trials[0])}, Seed: {seed}')
+        logging.info("===================================")
+
+    for i in range(num_gibbs_iters): 
         t = time.time()
 
         #########################################
@@ -178,15 +199,15 @@ def infer_dp(
         # Save samples
         active_cluster_ids = active_cluster_ids.clone().cpu().numpy()
         params_active = params_active.clone().cpu().numpy()
-
+       
         # Print and log output
         iter_time = time.time() - t
-        print(
+        logging.info(
             f"iter: #{i:3d} | time: {iter_time:4.2f} | num clusters: {len(params_active)} "
             f"| counts: {str(np.bincount(active_cluster_ids))} | accept prob: {num_accept / num_total:.3f}"
         )
-        print(f"             params: {np.array2string(params_active.T[0].round(2))}")
-        print(f"                     {np.array2string(params_active.T[1].round(2))}")
+        logging.info(f"             params: {np.array2string(params_active.T[0].round(2))}")
+        logging.info(f"                     {np.array2string(params_active.T[1].round(2))}")
 
         # Write pickle
         if out_prefix is not None:

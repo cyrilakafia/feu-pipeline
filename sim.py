@@ -5,6 +5,7 @@ from feu.sb import infer_dp
 from feu.visualize_heatmap import viz_heatmap
 
 def run_sim(
+        title = "sim",
         seed = 1231,
         device = "cpu",
         rate_change_noise = 0.02,
@@ -13,12 +14,11 @@ def run_sim(
         iterations = 5
         ):
     
+    title  = title + "_" + str(seed)
     torch.set_default_dtype(torch.double)
     torch.set_default_device(device)
     
     torch.manual_seed(seed)
-
-    title = f"sim_{seed}"   
 
     delta = 1 / 1000
     obs_all = []
