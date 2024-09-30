@@ -9,6 +9,7 @@ def run_sim(
         seed = 1231,
         device = "cpu",
         rate_change_noise = 0.02,
+        fix_num_neurons = None,
         num_neurons = 10,
         amplitude = 1.0,
         iterations = 5
@@ -22,10 +23,18 @@ def run_sim(
 
     delta = 1 / 1000
     obs_all = []
-    
 
     class_counts = Poisson(num_neurons).sample((5,)).to(torch.int)
 
+    if fix_num_neurons is not None:
+        # Scale the values to sum to fix_num_neurons
+        total_sum = class_counts.sum()
+        scaled_class_counts = (class_counts.float() / total_sum * fix_num_neurons).to(torch.int)
+
+        difference = fix_num_neurons - scaled_class_counts.sum()
+        scaled_class_counts[0] += difference 
+        class_counts = scaled_class_counts
+        
     for _ in range(class_counts[0]):
         l1 = Uniform(10, 25).sample()
         l2 = l1 * torch.exp(amplitude + Normal(0, rate_change_noise).sample())
