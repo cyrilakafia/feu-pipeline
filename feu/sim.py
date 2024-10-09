@@ -12,7 +12,7 @@ def run_sim(
         fix_num_neurons = None,
         num_neurons = 10,
         amplitude = 1.0,
-        iterations = 5
+        iterations = 1
         ):
     
     title  = title + "_" + str(seed)
