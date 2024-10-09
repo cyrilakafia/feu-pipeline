@@ -66,6 +66,48 @@ def viz_heatmap(title, iter, assigns_df = None, params_df = None, max_clusters=2
     params.fillna('0,0', inplace=True)
     split_params = params.applymap(lambda x: np.array(x.split(','), dtype=float))
 
+    coos = np.stack([ids_to_coo(x) for _, x in assigns.iterrows()])
+    mean_coo = coos.mean(axis=0)
+    dists = np.linalg.norm(coos - mean_coo, axis=(1, 2))   # dists measures how different each clustering assignment is from the average assignment
+    min_dist_idx = np.argmin(dists)     # identifies the most representative (closest to average) clustering assignment
+    match_idxs = np.where(np.all(coos == coos[min_dist_idx], axis=(1, 2)))[0]       # match_idxs lists all samples that have the exact same clustering assignment as the most representative one
+    print(f"Found {len(match_idxs)} samples out of {len(assigns)} that match the best assignment.")
+    
+    # reorder sample ids to match best assignment
+    reorder = assigns.loc[min_dist_idx].sort_values().index
+    
+    if figures:
+        # Plot cluster assignments
+        plt.imshow(mean_coo[np.ix_(reorder, reorder)], cmap="coolwarm")
+        plt.colorbar()
+
+        # Add chosen clustering in outline
+        counts = np.bincount(assigns.loc[min_dist_idx])
+        N = len(assigns.columns)
+        start = -0.5
+        for c in counts:
+            rect = patches.Rectangle((start, start), c, c, linewidth=1, edgecolor='lime', facecolor='none')
+            start += c
+            plt.gca().add_patch(rect)
+
+        plt.yticks(np.arange(N), reorder, fontsize=5)
+        plt.xticks(np.arange(N), reorder, fontsize=5, rotation=90)
+
+        if not os.path.exists(f'{title}'):
+            os.makedirs(f'{title}')
+        if not os.path.exists(f'{title}/{title}_assigns.png'):
+            plt.savefig(f'{title}/{title}_assigns.png', dpi = 500)
+        else:
+            oldfile = f'{title}_assigns.png'
+            os.remove(f'{title}/{oldfile}')
+            plt.savefig(f'{title}/{title}_assigns.png', dpi = 500)
+            
+        plt.close()
+        print(f'Saving cluster assignments heatmap to {title}/{title}_assigns.png')
+
+
+    ######### Single Data Point (Neuron) Figures ############
+
     average_params = []
 
     for count, datapoint in enumerate(assigns):
@@ -87,13 +129,99 @@ def viz_heatmap(title, iter, assigns_df = None, params_df = None, max_clusters=2
         average_params.append(final_datapoint_param_average)
 
     average_params = np.array(average_params)
-    # print(f'final params: {average_params}')
 
-    coos = np.stack([ids_to_coo(x) for _, x in assigns.iterrows()])
-    mean_coo = coos.mean(axis=0)
-    dists = np.linalg.norm(coos - mean_coo, axis=(1, 2))
-    min_dist_idx = np.argmin(dists)
-    match_idxs = np.where(np.all(coos == coos[min_dist_idx], axis=(1, 2)))[0]
+    best_assigns = pd.DataFrame(assigns.loc[min_dist_idx])
+    best_assigns.columns = ['cluster']
+
+    if figures:
+        # make params figure
+        plt.figure()
+
+        min_alpha = 0.7
+        max_alpha = 0.9
+
+        unique_clusters = np.unique(best_assigns.iloc[:, 0])
+        num_clusters = len(unique_clusters)
+
+        # Create a fixed color map for the clusters
+        colors_list = [
+            'red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan',
+            'magenta', 'yellow', 'teal', 'navy', 'maroon', 'lime', 'gold', 'silver', 'coral', 'lavender',
+            'indigo', 'turquoise', 'salmon', 'plum', 'tan', 'khaki', 'beige', 'crimson', 'darkgreen', 'lightblue'
+            ]
+        
+        cluster_labels = sorted(unique_clusters)
+        cluster_colors = {cluster_label: colors_list[i % len(colors_list)] for i, cluster_label in enumerate(cluster_labels)}
+
+        # Generate alphas based on cluster size or range
+        if num_clusters == 1:
+            alphas = np.full(len(best_assigns), max_alpha)
+
+        else:
+            alphas = min_alpha + (best_assigns.iloc[:, 0] - unique_clusters.min()) * (max_alpha - min_alpha) / (num_clusters - 1)
+
+        for i in range(len(average_params)):
+            cluster = best_assigns.iloc[i, 0]
+            plt.scatter(
+                average_params[i][1] + 15,
+                average_params[i][0],
+                s=40,
+                c=[cluster_colors[cluster]],
+                edgecolors='k',
+                alpha=alphas[i]
+            )
+
+        # Create a custom legend for clusters
+        for cluster, color in cluster_colors.items():
+            plt.scatter([], [], c=[color], edgecolors='k', s=40, label=f'Cluster {cluster+1}')
+
+        plt.xlabel('Phasicity')
+        plt.ylabel('Jump')
+        plt.tight_layout()
+        plt.legend()
+        plt.savefig(f'{title}/{title}_params.png', dpi = 500)
+        plt.close()
+        print(f'Saving scatter plot of cluster parameters to {title}/{title}_params.png')
+       
+
+    ######### Ensemble figure ###################
+
+    jump_phasicity = split_params.iloc[match_idxs]
+    
+    jump = jump_phasicity.applymap(lambda x: x[0])
+    phasicity = jump_phasicity.applymap(lambda x: x[1])
+
+    jump = jump.mean()
+    phasicity = phasicity.mean()
+
+    jump = pd.DataFrame([jump], index=['Mean'])
+    phasicity = pd.DataFrame([phasicity], index=['Mean'])
+    
+
+    jump = jump.loc[:, (jump != 0).any(axis=0)]
+    phasicity = phasicity.loc[:, (phasicity != 0).any(axis=0)]
+
+    jump = jump.to_numpy()
+    phasicity = phasicity.to_numpy()
+
+    print(type(jump))
+
+    if figures:
+        # make params figure
+
+        fig, ax = plt.subplots()
+
+        ax.scatter(phasicity + 15, jump, s=counts+40)
+
+        ax.set_xlabel("Phasicity")
+        ax.set_ylabel("Jump")
+
+        plt.savefig(f'{title}/{title}_ensembles.png', dpi=500)
+        plt.close()
+        print(f'Saving scatter plot of cluster parameters to {title}/{title}_ensembles.png')
+
+
+    # Save final csv files
 
     # get the best assigns
     best_assigns =  pd.DataFrame(assigns.loc[min_dist_idx])
@@ -112,69 +240,18 @@ def viz_heatmap(title, iter, assigns_df = None, params_df = None, max_clusters=2
     best_assigns.to_csv(f'{title}/{title}_best_assigns.csv')
     print(f'Found best assigns. Saving to file to {title}/{title}_best_assigns.csv')
 
-    reorder = assigns.loc[min_dist_idx].sort_values().index
+    # save ensemble params to csv file
+    ensemble_params = pd.DataFrame()
+    ensemble_params['Jump'] = jump.tolist()[0]              # a list of list is created e.g [[1,2,3,4,5]] so indexing to pick only the inner/main list
+    ensemble_params['Phasicity'] = phasicity.tolist()[0]
 
-    if figures:
-        # plot cluster assignments
-        plt.imshow(mean_coo[np.ix_(reorder, reorder)], cmap="coolwarm")
-        plt.colorbar()
-
-        N = len(assigns.columns)
-
-        plt.yticks(np.arange(N), reorder, fontsize=5)
-        plt.xticks(np.arange(N), reorder, fontsize=5, rotation=90)
-        plt.tight_layout()
-
-        # Add chosen clustering in outline
-        counts = np.bincount(best_assigns.iloc[0, :])
-        start = -0.5
-        for c in counts:
-            rect = patches.Rectangle((start, start), c, c, linewidth=1, edgecolor='lime', facecolor='none')
-            start += c
-            plt.gca().add_patch(rect)
-
-        if not os.path.exists(f'{title}'):
-            os.makedirs(f'{title}')
-        if not os.path.exists(f'{title}/{title}_assigns.png'):
-            plt.savefig(f'{title}/{title}_assigns.png', dpi = 500)
-        else:
-            oldfile = f'{title}_assigns.png'
-            os.remove(f'{title}/{oldfile}')
-            plt.savefig(f'{title}/{title}_assigns.png', dpi = 500)
-            
-        plt.close()
-        print(f'Saving cluster assignments heatmap to {title}/{title}_assigns.png')
-
-        # make params figure
-        if max(best_assigns.iloc[0, :]) > 19:
-            color_palette = 'viridis'
-        else:
-            color_palette = 'tab20'
-
-        min_alpha = 0.7
-        max_alpha = 0.9
-
-        unique_clusters = np.unique(best_assigns.iloc[0, :])
-        num_clusters = len(unique_clusters)
-
-        if num_clusters == 1:
-            alphas = 0.9
-
-        else:
-            alphas = min_alpha + (best_assigns.iloc[0, :] - unique_clusters.min()) * (max_alpha - min_alpha) / (num_clusters - 1)
-
-        plt.scatter(average_params[:, 1] + 15, average_params[:, 0], s=40, c=best_assigns.iloc[0, :], cmap=color_palette, edgecolors='k', alpha=alphas)
-        plt.xlabel('Phasicity')
-        plt.ylabel('Jump')
-        plt.title('FEU Space')
-        cbar = plt.colorbar()
-        cbar.set_label('Cluster')
-        plt.tight_layout()
-        plt.savefig(f'{title}/{title}_params.png', dpi = 500)
-        plt.close()
-        print(f'Saving scatter plot of cluster parameters to {title}/{title}_params.png')
+    ensemble_params.to_csv(f'{title}/{title}_ensemble_params.csv')
+    print(f'Saving ensemble params to {title}/{title}_ensemble_params.csv')
 
     return best_assigns, best_params
+
+
+#### RASTERS #####
 
 def plot_raster(raster, x_axis=None, ax=None, ms=10, offset=0):
     plt.grid('off')
