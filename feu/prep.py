@@ -58,8 +58,6 @@ def prep_pickle(data, dst):
         x_tensor = torch.from_numpy(x_tensor)
         x_tensor = (x_tensor, )
 
-    if x_tensor[0].dtype != torch.float64:
-        x_tensor = (x_tensor[0].float(), )
     torch.save(x_tensor, dst)
 
     print('Preprocessing done')
@@ -83,9 +81,6 @@ def prep_numpy(data, dst):
     x_tensor = (x_tensor, )
     torch.save(x_tensor, dst)
 
-    if x_tensor[0].dtype != torch.float64:
-        x_tensor = (x_tensor[0].float(), )
-
     print('Preprocessing done')
 
 def prep_torch(data, dst):
@@ -108,9 +103,6 @@ def prep_torch(data, dst):
     if len(x_tensor[0].shape) != 2:
         return 'Data must be 2D'
     
-    if x_tensor[0].dtype != torch.float64:
-        x_tensor = (x_tensor[0].float(), )
-    
     torch.save(x_tensor, dst)
 
     print('Preprocessing done')
@@ -122,9 +114,6 @@ def prep_csv(data, dst):
     x_tensor = (x_tensor, )
     torch.save(x_tensor, dst)
 
-    if x_tensor[0].dtype != torch.float64:
-        x_tensor = (x_tensor[0].float(), )
-
     print('Preprocessing done')
 
 def prep_xlsx(data, dst):
@@ -134,9 +123,6 @@ def prep_xlsx(data, dst):
     x_tensor = (x_tensor, )
     torch.save(x_tensor, dst)
 
-    if x_tensor[0].dtype != torch.float64:
-        x_tensor = (x_tensor[0].float(), )
-
     print('Preprocessing done')
 
 def prep_txt(data, dst):
@@ -144,9 +130,6 @@ def prep_txt(data, dst):
     x_tensor = torch.from_numpy(x)
     x_tensor = (x_tensor, )
     torch.save(x_tensor, dst)
-
-    if x_tensor[0].dtype != torch.float64:
-        x_tensor = (x_tensor[0].float(), )
 
 def prep_nwb(data, dst):
     pass
