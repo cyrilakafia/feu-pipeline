@@ -127,9 +127,9 @@ def particle_filter(
         )  # B
         curr_weights_norm = curr_weights / curr_weights.sum(dim=0)  # S x B
         if curr_weights_norm.isnan().any():
-            # import pdb
+            import pdb
 
-            # pdb.set_trace()
+            pdb.set_trace()
 
             raise ValueError("NaNs in weights")
             

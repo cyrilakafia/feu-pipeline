@@ -83,6 +83,7 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
         jumps = params[:, 0]
         log_vars = params[:, 1]
         p_inits = torch.sum(obs[:, :t_stimulus], dim=-1) / (num_trials * t_stimulus)
+        p_inits[p_inits<=0.1] = 0.1
         mean_inits = torch.log(p_inits) 
         variances = torch.exp(log_vars)
         return nssm_log_likelihood(
