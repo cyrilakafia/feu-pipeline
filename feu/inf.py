@@ -6,7 +6,7 @@ from feu.visualize_heatmap import viz_heatmap, plot_raster, make_raster_fig
 import numpy as np
 import matplotlib.pyplot as plt
 
-def run_inference(data, device, iterations, title='outputs', concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, seed=None, figures=True):
+def run_inference(data, device, iterations, title='outputs', concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, avg_rate=0.1, seed=None, figures=True):
     """
     Run the inference process on the given data.
 
@@ -49,12 +49,12 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
     # Else if number of trials is a regular python list or a numpy array
     if isinstance(num_trials, list) or isinstance(num_trials, np.ndarray):
         num_trials = torch.tensor(num_trials)
-        print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Varying number of trials i.e list, Stimulus Timepoint {t_stimulus}, Seed {seed}')
+        print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Varying number of trials i.e list, Stimulus Timepoint {t_stimulus}, Average Rate {avg_rate}, Seed {seed}')
     
     else: 
         num_trials = int(num_trials)
         num_trials = torch.ones(obs_all.shape[0]) * num_trials
-        print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Number of trials {str(num_trials[0])}, Stimulus Timepoint {t_stimulus}, Seed {seed}')
+        print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Number of trials {str(num_trials[0])}, Stimulus Timepoint {t_stimulus}, Average Rate {avg_rate}, Seed {seed}')
     
 
     # base distribution (G)
@@ -83,7 +83,7 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
         jumps = params[:, 0]
         log_vars = params[:, 1]
         p_inits = torch.sum(obs[:, :t_stimulus], dim=-1) / (num_trials * t_stimulus)
-        p_inits[p_inits<=0.1] = 0.1
+        p_inits[p_inits<=avg_rate] = avg_rate
         mean_inits = torch.log(p_inits) 
         variances = torch.exp(log_vars)
         return nssm_log_likelihood(
