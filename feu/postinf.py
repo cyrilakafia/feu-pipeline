@@ -24,7 +24,7 @@ def ids_to_coo(ids):
         coo[np.ix_(mask, mask)] = 1
     return coo
 
-def viz_heatmap(title, iter, assigns_df = None, params_df = None, max_clusters=20, figures=True):
+def find_best_clust_and_params(title, iter, assigns_df = None, params_df = None, max_clusters=20, figures=True):
     '''
     Visualize the cluster assignments as a heatmap
 
@@ -266,7 +266,13 @@ def plot_raster(raster, x_axis=None, ax=None, ms=10, offset=0):
             plt.plot(x_axis[mask], (i+1+offset) * np.ones(mask.sum()), 'k.', markersize=ms)
 
 def make_raster_fig(data, t_stimulus, best_assigns, title):
-    data_shape = data.values[0][0].shape
+    """
+    data: pd.DataFrame with a column "data" containing the raster data as numpy arrays
+    t_stimulus: int, the timepoint of the stimulus
+    best_assigns: pd.DataFrame with a single row containing the cluster assignments
+    title: str, the title of the figure
+    """
+    data_shape = data.values[0][0].shape 
     print(f'Data shape: {data_shape}')
     x_axis = np.arange(-t_stimulus, data_shape[1]-t_stimulus)
 

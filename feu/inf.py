@@ -2,30 +2,32 @@ import torch
 from torch.distributions import Uniform, Normal
 from feu.nssm import nssm_log_likelihood
 from feu.sb import infer_dp
-from feu.visualize_heatmap import viz_heatmap, plot_raster, make_raster_fig
+from feu.postinf import find_best_clust_and_params, plot_raster, make_raster_fig
 import numpy as np
 import matplotlib.pyplot as plt
 
-def run_inference(data, device, iterations, title='outputs', concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, avg_rate=0.1, seed=None, figures=True):
+def run_inference(data, device, iterations, title='outputs', concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, avg_rate=0.1, seed=42, figures=True, additional_info=None):
     """
     Run the inference process on the given data.
 
     Parameters:
     data (str): Path to the file containing the data to be processed.
-    title (str): Name for the run. Eg. 'rodent_5'
     device (str): Device to be used for PyTorch computation. Options: 'cpu', 'cuda'
     iterations (int): Number of iterations for the inference process.
+    title (str): Name for the run. This will also be the name the of output folder unless specified. Eg. 'rodent_5'
     concentration (float, optional): Probability of increased number of clusters. Defaults to 1.0.
     max_clusters (int, optional): Maximum number of clusters for the Dirichlet Process. Defaults to 20.
     num_trials (int, str, list, np.ndarray, optional): Number of trials for the data. This can be a number or a list of numbers separated by commas with the same length as the number of timeseries (neurons). Defaults to 1.
     t_stimulus (int, optional): Timepoint for stimulus. If there is no stimulus in the data, set this to 0.
-    seed (int, optional): Seed for the random number generator. Defaults to None.
+    avg_rate (float, optional): Average firing rate to be used if there is no stimulus in the data. Defaults to 0.1.
+    seed (int, optional): Seed for the random number generator. Defaults to 42.
     figures (bool, optional): Whether to generate figures. Defaults to True.
+    additional_info (str, optional): Any additional information to be added to the logging file. Defaults to None.
 
     Returns:
     tuple: The best assignments and parameters resulting from the inference process.
 
-    Outpus:
+    Outputs:
     Best cluster assignments CSV: Saves the best cluster assignments to `outputs/sim{run}_best_assigns.csv`.
     Best cluster parameters CSV: Saves the best cluster parameters to `outputs/sim{run}_best_params.csv`.
     Scatter Plot PNG: Saves a scatter plot of the cluster parameters to `outputs/sim{run}_params.png`.
@@ -124,6 +126,8 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
             out_prefix=f"{title}/{title}",
             max_clusters=max_clusters,
             seed=seed,
+            t_stimulus=0,
+            additional_info=additional_info,
         )
 
     else:
@@ -139,12 +143,14 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
             out_prefix=f"{title}/{title}",
             max_clusters=max_clusters,
             seed=seed,
+            t_stimulus=t_stimulus,
+            additional_info=additional_info,
         )
 
 
 
     print(f'{title} run for {iterations} iterations - Inference done')
-    best_assings, best_params = viz_heatmap(title, iterations, max_clusters=max_clusters, figures=figures)
+    best_assings, best_params = find_best_clust_and_params(title, iterations, max_clusters=max_clusters, figures=figures)
 
     #Viz rasters
 

@@ -2,7 +2,7 @@ import torch
 from torch.distributions import Uniform, Normal, Binomial, Poisson
 from feu.nssm import nssm_log_likelihood
 from feu.sb import infer_dp
-from feu.visualize_heatmap import viz_heatmap
+from feu.postinf import viz_heatmap
 
 def run_sim(
         title = "sim",

@@ -22,6 +22,8 @@ def infer_dp(
     samp_prop: Optional[Callable[[Tensor], Tensor]] = None,
     out_prefix: Optional[str] = None,
     seed: Optional[int] = None,
+    t_stimulus: int = 0,
+    additional_info: Optional[str] = None,
 ):
     
     settings = {"dtype": obs.dtype, "device": obs.device}
@@ -64,24 +66,43 @@ def infer_dp(
         # ):
         #     raise ValueError(f"There already exists a file with prefix {out_prefix}.")
 
-         # Congifure logging
+        # Configure logging
+        log_file = out_prefix + "_iteration_log.txt"
+        counter = 1
+        while os.path.exists(log_file):
+            log_file = f"{out_prefix}_iteration_log_{counter}.txt"
+            counter += 1
+
         logging.basicConfig(level=logging.INFO, 
                             format='%(message)s',
                             handlers=[
-                                logging.FileHandler(out_prefix + "_iteration_log.txt"),
+                                logging.FileHandler(log_file),
                                 logging.StreamHandler()
                             ])
-
+        logging.info(f"Context on FEU run: {additional_info}")
         logging.info("Starting DPnSSM inference algorithm")
         # log the current date and time
         logging.info(time.strftime("%c"))
         logging.info("===================================")
         logging.info("Parameters:")
         if isinstance(num_trials, list) or isinstance(num_trials, np.ndarray):
-            logging.info(f'Title: {out_prefix}, Iterations: {num_gibbs_iters}, Max clusters: {max_clusters}, Seed: {seed}')
-            logging.info(f'Varying number of trials i.e list')
+            logging.info(f'Title: {out_prefix}')
+            logging.info(f'Concentration: {concentration}')
+            logging.info(f'Stimulus Timepoint: {t_stimulus}')
+            logging.info(f'Iterations: {num_gibbs_iters}')
+            logging.info(f'Max clusters: {max_clusters}')
+            logging.info(f'Different number of trials for each timeseries so a list is provided i.e list')
+            logging.info(f'Device: {str(obs.device)}')
+            logging.info(f'Seed: {seed}')
         else:
-            logging.info(f'Title: {out_prefix}, Iterations: {num_gibbs_iters}, Max clusters: {max_clusters}, Number of trials: {str(num_trials[0])}, Seed: {seed}')
+            logging.info(f'Title: {out_prefix}')
+            logging.info(f'Concentration: {concentration}')
+            logging.info(f'Stimulus Timepoint: {t_stimulus}')
+            logging.info(f'Iterations: {num_gibbs_iters}')
+            logging.info(f'Max clusters: {max_clusters}')
+            logging.info(f'Number of trials: {str(num_trials[0])}')
+            logging.info(f'Device: {str(obs.device)}')
+            logging.info(f'Seed: {seed}')
         logging.info("===================================")
 
     for i in range(num_gibbs_iters): 
