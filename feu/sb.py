@@ -93,7 +93,9 @@ def infer_dp(
                                 logging.FileHandler(log_file),
                                 logging.StreamHandler()
                             ])
-        logging.info(f"Context on FEU run: {additional_info}")
+        logging.info(f"Context on FEU run: {additional_info}\n")
+        logging.info("===================================")
+        logging.info("===================================\n")
         logging.info("Starting DPnSSM inference algorithm")
         # log the current date and time
         logging.info(time.strftime("%c"))
