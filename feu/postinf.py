@@ -24,7 +24,7 @@ def ids_to_coo(ids):
         coo[np.ix_(mask, mask)] = 1
     return coo
 
-def find_best_clust_and_params(title, iter, assigns_df = None, params_df = None, max_clusters=20, figures=True):
+def find_best_clust_and_params(title, output_folder, iter, assigns_df = None, params_df = None, max_clusters=20, figures=True):
     '''
     Visualize the cluster assignments as a heatmap
 
@@ -40,24 +40,24 @@ def find_best_clust_and_params(title, iter, assigns_df = None, params_df = None,
     best_assigns (pd.DataFrame): the best cluster assignments
     best_params (pd.DataFrame): the best cluster parameters
     
-    Saves best cluster assignments to {title}/{title}_best_assigns.csv
-    Saves best cluster parameters to {title}/{title}_best_params.csv
-    Saves a scatter plot of cluster parameters to {title}/{title}_params.png
-    Saves a heatmap of the cluster assignments to {title}/{title}_assigns.png
+    Saves best cluster assignments to {output_folder}_best_assigns.csv
+    Saves best cluster parameters to {output_folder}_best_params.csv
+    Saves a scatter plot of cluster parameters to {output_folder}_params.png
+    Saves a heatmap of the cluster assignments to {output_folder}_assigns.png
     '''
 
     if iter < 510:
         if assigns_df is None or params_df is None:
-            assigns = pd.read_csv(f"{title}/{title}_assigns.csv", header=None)
-            params = pd.read_csv(f"{title}/{title}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
+            assigns = pd.read_csv(f"{output_folder}_assigns.csv", header=None)
+            params = pd.read_csv(f"{output_folder}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
         else:
             assigns = pd.read_csv(f"{assigns_df}", header=None)
             params = pd.read_csv(f"{params_df}", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
 
     else:
         if assigns_df is None or params_df is None:
-            assigns = pd.read_csv(f"{title}/{title}_assigns.csv", header=None).iloc[500:].reset_index(drop=True)
-            params = pd.read_csv(f"{title}/{title}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
+            assigns = pd.read_csv(f"{output_folder}_assigns.csv", header=None).iloc[500:].reset_index(drop=True)
+            params = pd.read_csv(f"{output_folder}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
         else:
             assigns = pd.read_csv(f"{assigns_df}", header=None).iloc[500:].reset_index(drop=True)
             params = pd.read_csv(f"{params_df}", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters)).iloc[500:].reset_index(drop=True)
@@ -95,15 +95,15 @@ def find_best_clust_and_params(title, iter, assigns_df = None, params_df = None,
 
         if not os.path.exists(f'{title}'):
             os.makedirs(f'{title}')
-        if not os.path.exists(f'{title}/{title}_assigns.png'):
-            plt.savefig(f'{title}/{title}_assigns.png', dpi = 500)
+        if not os.path.exists(f'{output_folder}_assigns.png'):
+            plt.savefig(f'{output_folder}_assigns.png', dpi = 500)
         else:
             oldfile = f'{title}_assigns.png'
             os.remove(f'{title}/{oldfile}')
-            plt.savefig(f'{title}/{title}_assigns.png', dpi = 500)
+            plt.savefig(f'{output_folder}_assigns.png', dpi = 500)
             
         plt.close()
-        print(f'Saving cluster assignments heatmap to {title}/{title}_assigns.png')
+        print(f'Saving cluster assignments heatmap to {output_folder}_assigns.png')
 
 
     ######### Single Data Point (Neuron) Figures ############
@@ -179,9 +179,9 @@ def find_best_clust_and_params(title, iter, assigns_df = None, params_df = None,
         plt.ylabel('Jump')
         plt.tight_layout()
         plt.legend()
-        plt.savefig(f'{title}/{title}_params.png', dpi = 500)
+        plt.savefig(f'{output_folder}_params.png', dpi = 500)
         plt.close()
-        print(f'Saving scatter plot of cluster parameters to {title}/{title}_params.png')
+        print(f'Saving scatter plot of cluster parameters to {output_folder}_params.png')
        
 
     ######### Ensemble figure ###################
@@ -216,9 +216,9 @@ def find_best_clust_and_params(title, iter, assigns_df = None, params_df = None,
         ax.set_xlabel("Phasicity")
         ax.set_ylabel("Jump")
 
-        plt.savefig(f'{title}/{title}_ensembles.png', dpi=500)
+        plt.savefig(f'{output_folder}_ensembles.png', dpi=500)
         plt.close()
-        print(f'Saving scatter plot of cluster parameters to {title}/{title}_ensembles.png')
+        print(f'Saving scatter plot of cluster parameters to {output_folder}_ensembles.png')
 
 
     # Save final csv files
@@ -230,23 +230,23 @@ def find_best_clust_and_params(title, iter, assigns_df = None, params_df = None,
     # save params to file
     best_params = pd.DataFrame(average_params)
     best_params.columns = ['jump', 'phasicity']
-    best_params.to_csv(f'{title}/{title}_best_params.csv')
-    print(f'Found best parameters. Saving to file to {title}/{title}_best_params.csv')
+    best_params.to_csv(f'{output_folder}_best_params.csv')
+    print(f'Found best parameters. Saving to file to {output_folder}_best_params.csv')
 
     # rotate the df
     best_assigns = best_assigns.T
 
     # save best_assigns to csv file
-    best_assigns.to_csv(f'{title}/{title}_best_assigns.csv')
-    print(f'Found best assigns. Saving to file to {title}/{title}_best_assigns.csv')
+    best_assigns.to_csv(f'{output_folder}_best_assigns.csv')
+    print(f'Found best assigns. Saving to file to {output_folder}_best_assigns.csv')
 
     # save ensemble params to csv file
     ensemble_params = pd.DataFrame()
     ensemble_params['Jump'] = jump.tolist()[0]              # a list of list is created e.g [[1,2,3,4,5]] so indexing to pick only the inner/main list
     ensemble_params['Phasicity'] = phasicity.tolist()[0]
 
-    ensemble_params.to_csv(f'{title}/{title}_ensemble_params.csv')
-    print(f'Saving ensemble params to {title}/{title}_ensemble_params.csv')
+    ensemble_params.to_csv(f'{output_folder}_ensemble_params.csv')
+    print(f'Saving ensemble params to {output_folder}_ensemble_params.csv')
 
     return best_assigns, best_params
 
@@ -265,7 +265,7 @@ def plot_raster(raster, x_axis=None, ax=None, ms=10, offset=0):
         else:
             plt.plot(x_axis[mask], (i+1+offset) * np.ones(mask.sum()), 'k.', markersize=ms)
 
-def make_raster_fig(data, t_stimulus, best_assigns, title):
+def make_raster_fig(data, t_stimulus, best_assigns, title, output_folder):
     """
     data: pd.DataFrame with a column "data" containing the raster data as numpy arrays
     t_stimulus: int, the timepoint of the stimulus
@@ -300,7 +300,7 @@ def make_raster_fig(data, t_stimulus, best_assigns, title):
         fig.delaxes(axes[idx])
 
     plt.tight_layout()
-    plt.savefig(f'{title}/{title}_raster_clusters.png')
+    plt.savefig(f'{output_folder}_raster_clusters.png')
     # plt.show()
 
 
@@ -323,5 +323,5 @@ def make_raster_fig(data, t_stimulus, best_assigns, title):
 #             plot_raster(raster, ms=1, x_axis=x_axis)
 #         plt.axvline(0, c='r')
 #         plt.title(f'Cluster {k + 1}, Neuron Count: {len(subset)}')
-#         plt.savefig(f'{title}/{title}_raster_cluster_{k+1}.png')
+#         plt.savefig(f'{output_folder}_raster_cluster_{k+1}.png')
 #         # plt.show()

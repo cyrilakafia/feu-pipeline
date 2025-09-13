@@ -5,13 +5,14 @@ from feu.postinf import find_best_clust_and_params, make_raster_fig
 import torch
 import pandas as pd
 import numpy as np
+import shutil
 
 job_summary = "Test FEU RUN"
 
 # Define the parameters
 title = '09-12-2025-test'
 device = 'cpu'
-num_iterations = 5
+num_iterations = 2
 conc = 1
 max_clusters = 20
 stimulus_timepoint = 1
@@ -44,7 +45,7 @@ if not os.path.exists(title):
 prep(original_data_2d, preprocessed_data)
 
 
-best_assigns, best_params = run_inference(
+best_assigns, best_params, output_prefix = run_inference(
                                         preprocessed_data,
                                         title=title, 
                                         device=device,
@@ -58,6 +59,9 @@ best_assigns, best_params = run_inference(
                                         additional_info=job_summary
                                         )
 
+# Move processed_data.p to the output folder
+shutil.move(preprocessed_data, os.path.join(output_prefix.split("/")[0], output_prefix.split("/")[1], 'processed_data.p'))
+
 # Assuming you have already run the inference process, you can find best assignment and paramsn and visualize the results using the following code:
 # best_assigns, best_params = viz_heatmap('human_ephys_test4', 2641, 'outputs/simhuman_ephys_test4_assigns.csv', 'outputs/simhuman_ephys_test4_params.tsv', max_clusters=20)
 
@@ -70,5 +74,5 @@ data_reshaped = np.transpose(data, (1, 0, 2))
 
 data_df = pd.DataFrame({'data': list(data_reshaped)})  # Convert each row of the array to a separate row in DataFrame
 print(data_df.values[0][0].shape)
-data_df.to_csv(f'{title}/data_for_raster.csv', index=False)
-make_raster_fig(data_df, t_stimulus=stimulus_timepoint, best_assigns=best_assigns, title=title)
+data_df.to_csv(f'{output_prefix}_data_for_raster.csv', index=False)
+make_raster_fig(data_df, t_stimulus=stimulus_timepoint, best_assigns=best_assigns, title=title, output_folder=output_prefix)

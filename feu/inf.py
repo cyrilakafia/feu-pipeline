@@ -114,7 +114,7 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
         )    
 
     if t_stimulus == 0:
-        output = infer_dp(
+        output_folder = infer_dp(
             obs_all.to(device),
             num_trials,
             calc_bssm_log_like_sim_no_stim,
@@ -131,7 +131,7 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
         )
 
     else:
-        output = infer_dp(
+        output_folder = infer_dp(
             obs_all.to(device),
             num_trials,
             calc_bssm_log_like_sim,
@@ -150,7 +150,7 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
 
 
     print(f'{title} run for {iterations} iterations - Inference done')
-    best_assings, best_params = find_best_clust_and_params(title, iterations, max_clusters=max_clusters, figures=figures)
+    best_assings, best_params = find_best_clust_and_params(title, output_folder=output_folder, iter=iterations, max_clusters=max_clusters, figures=figures)
 
     #Viz rasters
 
@@ -160,7 +160,7 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
 
     print('Pipeline done')
 
-    return best_assings, best_params
+    return best_assings, best_params, output_folder
 
 
 # # Example of how to call the function

@@ -51,11 +51,25 @@ def infer_dp(
     num_accept = 0
     num_total = 0
         
-    # create output directory
-    if not os.path.exists(out_prefix.split("/")[0]):
-        os.makedirs(out_prefix.split("/")[0])
-
+    # create output directory and run subfolder
     if out_prefix is not None:
+        base_dir = out_prefix.split("/")[0] if "/" in out_prefix else "."
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir)
+        
+        # Find the next available run folder
+        run_counter = 1
+        while True:
+            run_folder = os.path.join(base_dir, f"run{run_counter}")
+            if not os.path.exists(run_folder):
+                os.makedirs(run_folder)
+                break
+            run_counter += 1
+        
+        # Update out_prefix to include the run folder
+        filename = out_prefix.split("/")[-1] if "/" in out_prefix else out_prefix
+        out_prefix = os.path.join(run_folder, filename)
+
         with open(out_prefix + "_assigns.csv", "w") as fassign:
             fassign.write("")
 
@@ -241,3 +255,5 @@ def infer_dp(
                     "\t".join([f"{p1:.5f},{p2:.5f}" for p1, p2 in params_active])
                 )
                 fcluster.write("\n")
+
+    return out_prefix
