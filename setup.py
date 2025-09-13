@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='feu',
-    version='0.09.12.2025',
+    version='0.09.13.2025',
     packages=find_packages(),
     install_requires=[
         'torch',
