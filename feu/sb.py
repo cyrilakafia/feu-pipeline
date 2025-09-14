@@ -24,6 +24,12 @@ def infer_dp(
     seed: Optional[int] = None,
     t_stimulus: int = 0,
     additional_info: Optional[str] = None,
+
+    # Early stopping controls
+    early_stopping: bool = False,
+    conv_tol: float = 1e-1, 
+    conv_patience: int = 10,
+    cluster_count_tol: int = 1,
 ):
     
     settings = {"dtype": obs.dtype, "device": obs.device}
@@ -35,13 +41,13 @@ def infer_dp(
     # Initialize variables
     num_obs = len(obs)
     num_clusters = max_clusters
+
+    # Initialize stick-breaking fractions
     # stick_fracs = Beta(concentration, 1).sample((max_clusters - 1,))
     stick_fracs_np = np.random.beta(concentration, 1, size=(max_clusters - 1,)).astype(np.float32)
     stick_fracs = torch.tensor(stick_fracs_np, device=obs.device)
 
-
-
-
+    # Initialize parameters
     params = samp_base(num_clusters)
     num_params = params.size(dim=-1)
 
@@ -50,6 +56,11 @@ def infer_dp(
 
     num_accept = 0
     num_total = 0
+
+    # Early-stopping trackers
+    prev_params = params.clone()
+    stable_iters = 0
+    params_active_list = []
         
     # create output directory and run subfolder
     if out_prefix is not None:
@@ -81,10 +92,10 @@ def infer_dp(
         #     raise ValueError(f"There already exists a file with prefix {out_prefix}.")
 
         # Configure logging
-        log_file = out_prefix + "_iteration_log.txt"
+        log_file = out_prefix + "_log.txt"
         counter = 1
         while os.path.exists(log_file):
-            log_file = f"{out_prefix}_iteration_log_{counter}.txt"
+            log_file = f"{out_prefix}_log_{counter}.txt"
             counter += 1
 
         logging.basicConfig(level=logging.INFO, 
@@ -233,9 +244,24 @@ def infer_dp(
         params[active_clusters] = params_active
         params[~active_clusters] = params_inactive
 
+
+        # # Early stopping check
+        # with torch.no_grad():
+        #     logging.info(f"Current Params: {params_active}, Prev Params: {prev_params}")
+        #     avg_abs_change = (params.abs() - prev_params.abs()).abs().mean().item() 
+        #     logging.info(f"Average absolute parameter change: {avg_abs_change:.4f}")
+        #     if avg_abs_change < conv_tol:
+        #         stable_iters += 1
+        #     else:
+        #         stable_iters = 0
+        #     prev_params = params.clone()
+
         # Save samples
         active_cluster_ids = active_cluster_ids.clone().cpu().numpy()
         params_active = params_active.clone().cpu().numpy()
+
+        # Update params_active_list for early stopping
+        params_active_list.append(params_active)
        
         # Print and log output
         iter_time = time.time() - t
@@ -246,7 +272,7 @@ def infer_dp(
         logging.info(f"             params: {np.array2string(params_active.T[0].round(2))}")
         logging.info(f"                     {np.array2string(params_active.T[1].round(2))}")
 
-        # Write pickle
+        # Write outputs
         if out_prefix is not None:
             with open(out_prefix + "_assigns.csv", "a") as fassign:
                 fassign.write(",".join([str(x) for x in active_cluster_ids]))
@@ -257,5 +283,37 @@ def infer_dp(
                     "\t".join([f"{p1:.5f},{p2:.5f}" for p1, p2 in params_active])
                 )
                 fcluster.write("\n")
+
+        # Early stopping check
+        last_n = int(conv_patience*5)
+
+        # Only check for early stopping if we have enough iterations
+        if early_stopping and len(params_active_list) >= last_n:
+            last_n_entries = params_active_list[-last_n:]
+            cluster_counts_last_n = [len(p) for p in last_n_entries]
+
+            # If the number of clusters has been stable for the last n iterations within a tolerance of cluster_count_tol
+            # Check if the number of clusters has not changed by more than cluster_count_tol in the last n iterations
+            last_last_n = int(conv_patience)
+            if max(cluster_counts_last_n) - min(cluster_counts_last_n) <= cluster_count_tol:
+                last_last_n_entries = params_active_list[-last_last_n:]
+                cluster_counts_last_last_n = [len(p) for p in last_last_n_entries]
+
+                # If the number of clusters has been exactly the same for the last last_n iterations
+                if max(cluster_counts_last_last_n) - min(cluster_counts_last_last_n) == 0:
+                    with torch.no_grad():
+                        #recursively find the difference between params in last_last_n_entries
+                        avg_abs_changes = []
+                        for j in range(1, len(last_last_n_entries)):
+                            mean_abs_change = (torch.tensor(last_last_n_entries[j]).abs() - torch.tensor(last_last_n_entries[j-1]).abs()).abs().mean().item()
+                            avg_abs_changes.append(mean_abs_change)
+                        avg_abs_change = np.mean(avg_abs_changes)
+                        if avg_abs_change < conv_tol:
+                            logging.info(f"===============================")
+                            logging.info(f"Early stopping at iteration {i}. Number of clusters has been stable for {last_n} iterations within a tolerance of {cluster_count_tol} clusters and exactly the same for the last {last_last_n} iterations.")
+                            logging.info(f"Average absolute jump and phasicity parameter change over last {last_last_n} iterations: {avg_abs_change:.4f}")
+                            logging.info(f"No significant parameter changes for {last_last_n} consecutive iterations. Tolerance: {conv_tol}")
+                            logging.info(f"===============================")
+                            break
 
     return out_prefix
