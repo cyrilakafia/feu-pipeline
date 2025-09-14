@@ -6,7 +6,7 @@ from feu.postinf import find_best_clust_and_params, plot_raster, make_raster_fig
 import numpy as np
 import matplotlib.pyplot as plt
 
-def run_inference(data, device, iterations, title='outputs', concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, avg_rate=0.1, seed=42, figures=True, additional_info=None):
+def run_inference(data, device, iterations, title='outputs', concentration=1.0, max_clusters=20, num_trials = 1, t_stimulus=0, avg_rate=0.1, seed=42, figures=True, early_stopping=False, conv_tol=1e-1, conv_patience=10, cluster_count_tol=1, additional_info=None):
     """
     Run the inference process on the given data.
 
@@ -51,12 +51,12 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
     # Else if number of trials is a regular python list or a numpy array
     if isinstance(num_trials, list) or isinstance(num_trials, np.ndarray):
         num_trials = torch.tensor(num_trials)
-        print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Varying number of trials i.e list, Stimulus Timepoint {t_stimulus}, Average Rate {avg_rate}, Seed {seed}')
+        print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Varying number of trials i.e list, Stimulus Timepoint {t_stimulus}, Average Rate {avg_rate}, Seed {seed}, Early stopping {early_stopping}, Tolerance {conv_tol}, Patience {conv_patience}, Cluster count tolerance {cluster_count_tol}')
     
     else: 
         num_trials = int(num_trials)
         num_trials = torch.ones(obs_all.shape[0]) * num_trials
-        print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Number of trials {str(num_trials[0])}, Stimulus Timepoint {t_stimulus}, Average Rate {avg_rate}, Seed {seed}')
+        print(f'{title}, Iterations {iterations}, Concentration {concentration}, Max Clusters {max_clusters}, Number of trials {str(num_trials[0])}, Stimulus Timepoint {t_stimulus}, Average Rate {avg_rate}, Seed {seed}, Early stopping {early_stopping}, Tolerance {conv_tol}, Patience {conv_patience}, Cluster count tolerance {cluster_count_tol}')
     
 
     # base distribution (G)
@@ -128,6 +128,10 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
             seed=seed,
             t_stimulus=0,
             additional_info=additional_info,
+            early_stopping=early_stopping,
+            conv_tol=conv_tol,
+            conv_patience=conv_patience,
+            cluster_count_tol=cluster_count_tol
         )
 
     else:
@@ -145,12 +149,16 @@ def run_inference(data, device, iterations, title='outputs', concentration=1.0, 
             seed=seed,
             t_stimulus=t_stimulus,
             additional_info=additional_info,
+            early_stopping=early_stopping, 
+            conv_patience=conv_patience,
+            conv_tol=conv_tol,
+            cluster_count_tol=cluster_count_tol
         )
 
 
 
     print(f'{title} run for {iterations} iterations - Inference done')
-    best_assings, best_params = find_best_clust_and_params(title, output_folder=output_folder, iter=iterations, max_clusters=max_clusters, figures=figures)
+    best_assings, best_params = find_best_clust_and_params(title, output_folder=output_folder, max_clusters=max_clusters, figures=figures)
 
     #Viz rasters
 

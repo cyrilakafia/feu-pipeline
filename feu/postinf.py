@@ -24,13 +24,12 @@ def ids_to_coo(ids):
         coo[np.ix_(mask, mask)] = 1
     return coo
 
-def find_best_clust_and_params(title, output_folder, iter, assigns_df = None, params_df = None, max_clusters=20, figures=True):
+def find_best_clust_and_params(title, output_folder, assigns_df = None, params_df = None, max_clusters=20, figures=True):
     '''
     Visualize the cluster assignments as a heatmap
 
     Args:
     title (str): the title number
-    iter (int): the number of iterations
     assigns (pd.DataFrame): the cluster assignments
     params (pd.DataFrame): the cluster parameters
     max_clusters (int): the maximum number of clusters
@@ -46,12 +45,17 @@ def find_best_clust_and_params(title, output_folder, iter, assigns_df = None, pa
     Saves a heatmap of the cluster assignments to {output_folder}_assigns.png
     '''
 
+    if assigns_df is None or params_df is None:
+        assigns = pd.read_csv(f"{output_folder}_assigns.csv", header=None)
+    else:
+        assigns = pd.read_csv(f"{assigns_df}", header=None)
+
+    iter = assigns.shape[0]
+
     if iter < 510:
         if assigns_df is None or params_df is None:
-            assigns = pd.read_csv(f"{output_folder}_assigns.csv", header=None)
             params = pd.read_csv(f"{output_folder}_params.tsv", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
         else:
-            assigns = pd.read_csv(f"{assigns_df}", header=None)
             params = pd.read_csv(f"{params_df}", header=None, sep='\t', on_bad_lines='warn', names=np.arange(0, max_clusters))
 
     else:

@@ -2,7 +2,7 @@ import torch
 from torch.distributions import Uniform, Normal, Binomial, Poisson
 from feu.nssm import nssm_log_likelihood
 from feu.sb import infer_dp
-from feu.postinf import viz_heatmap
+from feu.postinf import find_best_clust_and_params
 
 def run_sim(
         title = "sim",
@@ -139,19 +139,30 @@ def run_sim(
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    output = infer_dp(
-        obs_all.to(device),
-        num_trials,  
-        calc_bssm_log_like_sim,
-        1.0,
-        samp_base,
-        base_logpdf,
+    # parameters
+    concentration = 1.0
+    additional_info = f"Simulated data with {obs_all.shape[0]} neurons and seed {seed}"
+    t_stimulus = 100
+    max_clusters = 20
+
+    output_folder = infer_dp(
+        obs=obs_all.to(device),
+        num_trials=num_trials,
+        calc_log_like=calc_bssm_log_like_sim,
+        concentration=concentration,
+        samp_base=samp_base,
+        base_logpdf=base_logpdf,
         num_gibbs_iters=iterations,
+        max_clusters=max_clusters,
         samp_prop=samp_prop,
         out_prefix=f"{title}/{title}",
         seed=seed,
+        t_stimulus=t_stimulus,
+        additional_info=additional_info,
+        early_stopping=True,
     )
 
     print(f'Simulated {title} run - Inference done')
-    best_assings, best_params = viz_heatmap(title, iterations)
+    print(f'Output folder: {output_folder}')
+    best_assigns, best_params = find_best_clust_and_params(title, output_folder=output_folder, max_clusters=max_clusters, figures=True)
     print('Pipeline done')
