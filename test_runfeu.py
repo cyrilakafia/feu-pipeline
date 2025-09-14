@@ -12,29 +12,29 @@ job_summary = "Test FEU RUN"
 # Define the parameters
 title = '09-12-2025-test'
 device = 'cpu'
-num_iterations = 2
+num_iterations = 500
 conc = 1
-max_clusters = 20
-stimulus_timepoint = 1
+max_clusters = 5
+stimulus_timepoint = 0
 num_trials = 10
 additional_info = 'Test run on 09-12-2025'
 # num_trials = np.arange(100, 130)
 
-# simulate a numpy array with shape 10 x 30 x 200
-spike_data = np.random.randint(0, 2, size=(10, 30, 200))
-np.save('test_data/array_30_200.npy', spike_data.astype(np.float32))
+# simulate a numpy array with shape 10 x 30 x 100
+spike_data = np.random.randint(0, 2, size=(10, 30, 100))
+np.save('test_data/array_30_100.npy', spike_data.astype(np.float32))
 print(f"Simulated data shape: {spike_data.shape}")
 
-original_data = 'test_data/array_30_200.npy'
+original_data = 'test_data/array_30_100.npy'
 
 # sum over trials to get spike counts per neuron
 spike_data_summed = np.sum(spike_data, axis=0)
 print(f"Summed data shape: {spike_data_summed.shape}")
 print(spike_data_summed)
 # save the summed data as a numpy file
-np.save('test_data/array_30_200_2d.npy', spike_data_summed.astype(np.float32))
+np.save('test_data/array_30_100_2d.npy', spike_data_summed.astype(np.float32))
 
-original_data_2d = 'test_data/array_30_200_2d.npy'
+original_data_2d = 'test_data/array_30_100_2d.npy'
 
 # Preprocess the data
 preprocessed_data = f'{title}/processed_data.p'
@@ -56,6 +56,7 @@ best_assigns, best_params, output_prefix = run_inference(
                                         t_stimulus=stimulus_timepoint,
                                         seed=42,
                                         figures=True,
+                                        early_stopping=True,
                                         additional_info=job_summary
                                         )
 
