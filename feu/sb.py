@@ -23,6 +23,7 @@ def infer_dp(
     out_prefix: Optional[str] = None,
     seed: Optional[int] = None,
     t_stimulus: int = 0,
+    avg_rate: Optional[float] = None,
     additional_info: Optional[str] = None,
 
     # Early stopping controls
@@ -104,7 +105,7 @@ def infer_dp(
                                 logging.FileHandler(log_file),
                                 logging.StreamHandler()
                             ])
-        logging.info(f"Context on FEU run: {additional_info}\n")
+        logging.info(f"\nContext for FEU run: {additional_info}\n")
         logging.info("===================================")
         logging.info("===================================\n")
         logging.info("Starting DPnSSM inference algorithm")
@@ -116,20 +117,30 @@ def infer_dp(
             logging.info(f'Title: {out_prefix}')
             logging.info(f'Concentration: {concentration}')
             logging.info(f'Stimulus Timepoint: {t_stimulus}')
+            logging.info(f'Average Rate: {avg_rate}')
             logging.info(f'Iterations: {num_gibbs_iters}')
             logging.info(f'Max clusters: {max_clusters}')
             logging.info(f'Different number of trials for each timeseries so a list is provided i.e list')
             logging.info(f'Device: {str(obs.device)}')
             logging.info(f'Seed: {seed}')
+            logging.info(f'Early stopping: {early_stopping}')
+            logging.info(f'Early stopping tolerance: {conv_tol}')
+            logging.info(f'Early stopping patience: {conv_patience}')
+            logging.info(f'Cluster count tolerance: {cluster_count_tol}')
         else:
             logging.info(f'Title: {out_prefix}')
             logging.info(f'Concentration: {concentration}')
             logging.info(f'Stimulus Timepoint: {t_stimulus}')
             logging.info(f'Iterations: {num_gibbs_iters}')
+            logging.info(f'Average Rate: {avg_rate}')
             logging.info(f'Max clusters: {max_clusters}')
             logging.info(f'Number of trials: {str(num_trials[0])}')
             logging.info(f'Device: {str(obs.device)}')
             logging.info(f'Seed: {seed}')
+            logging.info(f'Early stopping: {early_stopping}')
+            logging.info(f'Early stopping tolerance: {conv_tol}')
+            logging.info(f'Early stopping patience: {conv_patience}')
+            logging.info(f'Cluster count tolerance: {cluster_count_tol}')
         logging.info("===================================")
 
     for i in range(num_gibbs_iters): 
