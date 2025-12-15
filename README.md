@@ -1,5 +1,7 @@
 # Functional Encoding Units (FEU)
 
+Web Application is available at [feucluster.com](https://www.feucluster.com/)
+
 FEU is a PyTorch-based pipeline for discovering Functional Encoding Units (clusters of similar time series) using a Dirichlet Process nonparametric state-space model (DPnSSM). Given 2D time-series data (entities × timepoints), FEU infers cluster assignments and per-cluster parameters and produces ready-to-use visualizations and CSVs.
 
 Note: This library is under active development. APIs may change and some features are experimental.
