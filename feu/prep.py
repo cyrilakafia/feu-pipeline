@@ -51,10 +51,11 @@ def prep_pickle(data, dst):
     with open(f'{data}', 'rb') as f:
         x = pickle.load(f)
     try:
+        x = x.astype(float)                                 # in the case of numpy arrays
         x_tensor = torch.from_numpy(x)
         x_tensor = (x_tensor, )
-    except TypeError:
-        x_tensor = np.array(x)                  # convert to numpy in the case of simple lists 
+    except AttributeError or TypeError:
+        x_tensor = np.array(x).astype(float)                  # convert to numpy in the case of simple lists 
         x_tensor = torch.from_numpy(x_tensor)
         x_tensor = (x_tensor, )
 
@@ -76,6 +77,7 @@ def prep_numpy(data, dst):
     Saves the preprocessed data to the specified destination
     """
     x = np.load(data)
+    x = x.astype(float)
     x_tensor = torch.from_numpy(x)
 
     x_tensor = (x_tensor, )
@@ -85,6 +87,7 @@ def prep_numpy(data, dst):
 
 def prep_torch(data, dst):
     x = torch.load(data)
+    x = x.float()
     
     # check if the data is a tuple
     if isinstance(x, tuple):
@@ -108,7 +111,7 @@ def prep_torch(data, dst):
     print('Preprocessing done')
 
 def prep_csv(data, dst):
-    df = pd.read_csv(data, header=None)
+    df = pd.read_csv(data, header=None).astype(float)
     x = df.to_numpy()
     x_tensor = torch.from_numpy(x)
     x_tensor = (x_tensor, )
@@ -117,7 +120,7 @@ def prep_csv(data, dst):
     print('Preprocessing done')
 
 def prep_xlsx(data, dst):
-    df = pd.read_excel(data, header=None)
+    df = pd.read_excel(data, header=None).astype(float)
     x = df.to_numpy()
     x_tensor = torch.from_numpy(x)
     x_tensor = (x_tensor, )
@@ -127,6 +130,7 @@ def prep_xlsx(data, dst):
 
 def prep_txt(data, dst):
     x = np.loadtxt(data)
+    x = x.astype(float)
     x_tensor = torch.from_numpy(x)
     x_tensor = (x_tensor, )
     torch.save(x_tensor, dst)
@@ -166,10 +170,13 @@ def prep(data, dst):
 
 if __name__ == '__main__':
     prep_pickle("../test_data/original_pickle_data.pickle", "../test_data/pickle_data_after_prep.p")
-    print('Test 1 pass')
+    print('Pickle (pickle) test pass')
 
     prep_pickle("../test_data/array_30_200.pkl", "../test_data/array_30_200_after_prep.p")
-    print('Test 2 pass')
+    print('Pickle (pkl)test pass')
 
     prep_numpy('../test_data/random_numpy_data.npy', '../test_data/numpy_data_after_prep.p')
-    print('Test 3 pass')
+    print('Numpy test pass')
+    
+    prep_csv('../test_data/spike_counts_50x15.csv', '../test_data/csv_data_after_prep.p')
+    print('CSV test pass')
