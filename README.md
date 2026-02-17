@@ -20,13 +20,13 @@ conda activate feu
 2) Install from GitHub (recommended):
 
 ```bash
-pip install -U git+https://github.com/cyrilakafia/feu-pipeline.git
+pip install -U git+https://github.com/cyrilakafia/feu-inference.git
 ```
 
 Alternatively, clone locally for development:
 
 ```bash
-git clone https://github.com/cyrilakafia/feu-pipeline.git
+git clone https://github.com/cyrilakafia/feu-inference.git
 cd feu-pipeline
 pip install -e .
 ```
